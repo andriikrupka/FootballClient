@@ -1,0 +1,43 @@
+﻿<prism:PrismUnityApplication
+    x:Class="FootballClient.UWP.App"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:FootballClient.UWP"
+    xmlns:prism="using:Prism.Unity.Windows"
+    xmlns:converters="using:FootballClient.UWP.Converters"
+    RequestedTheme="Light">
+
+    <prism:PrismUnityApplication.Resources>
+        <ResourceDictionary>
+
+            <SolidColorBrush x:Name="GreenBrush" Color="#00a603"/>
+
+
+            <converters:NullableBooleanConverter x:Key="NullableBooleanConverter"/>
+            <converters:StringCaseConverter x:Key="StringCaseConverter"/>
+            <converters:EmptyConverter x:Key="EmptyConverter"/>
+            <converters:MenuButtomColorConveter x:Key="MenuButtomColorConveter"/>
+            <converters:LineColorConveter x:Key="LineColorConveter"/>
+            <converters:EmptyToVisibilityConverter x:Key="EmptyToVisibilityConverter"/>
+            <converters:IntegerIncrementConverter x:Key="IntegerIncrementConverter"/>
+            <converters:BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter"/>
+            <converters:NumberToVisibilityConverter x:Key="NumberToVisibilityConverter"/>
+            <converters:MatchBackgroundConveter x:Key="MatchBackgroundConveter"/>
+            <converters:ScoreBackgroundConveter x:Key="ScoreBackgroundConveter"/>
+            <converters:DateTimeToDateTimeOffsetConverter x:Key="DateTimeToDateTimeOffsetConverter"/>
+            <converters:TextClassToFontWeightConverter x:Key="TextClassToFontWeightConverter"/>
+            <converters:IconClassToImageConverter x:Key="IconClassToImageConverter"/>
+            <converters:SwitchConverter x:Name="OverlayOpacityConverter">
+                <converters:Case Key="True" Value="1"/>
+                <converters:Case Key="False" Value="0"/>
+            </converters:SwitchConverter>
+
+            <converters:SwitchConverter x:Name="TextBlockOpacityConverter">
+                <converters:Case Key="True" Value="0.5"/>
+                <converters:Case Key="False" Value="1"/>
+            </converters:SwitchConverter>
+        </ResourceDictionary>
+    </prism:PrismUnityApplication.Resources>
+    
+   
+</prism:PrismUnityApplication>
