@@ -18,6 +18,7 @@ using Windows.UI.ViewManagement;
 using FootballClient.Models;
 using Windows.Foundation.Metadata;
 using Windows.UI;
+using Akavache;
 
 namespace FootballClient.UWP
 {
@@ -28,6 +29,7 @@ namespace FootballClient.UWP
         public App()
         {
             this.InitializeComponent();
+            BlobCache.ApplicationName = "FootballClient";
         }
 
         protected override INavigationService OnCreateNavigationService(IFrameFacade rootFrame)

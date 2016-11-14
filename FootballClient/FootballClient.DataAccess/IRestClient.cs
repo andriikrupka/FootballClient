@@ -1,17 +1,29 @@
-﻿using System.Net.Http;
+﻿using Akavache;
+using System;
+using System.Net.Http;
 using System.Threading.Tasks;
+using System.Reactive.Linq;
+using System.Reactive.Threading.Tasks;
 
 namespace FootballClient.DataAccess
 {
+    public enum DataAccessMode
+    {
+        Server,
+
+        Cache
+    }
+
     public interface IRestClient
     {
-        Task<T> SendMessageAsync<T>(HttpRequestMessage requestMessage, IParserStrategy<T> parser);
+        Task<T> SendMessageAsync<T>(HttpRequestMessage requestMessage, IParserStrategy<T> parser, DataAccessMode mode = DataAccessMode.Server);
     }
 
     public class RestClient : IRestClient
     {
         private HttpClient _httpClient;
         private HttpClientHandler _httpClientHandler;
+
         public RestClient()
         {
             _httpClientHandler = new HttpClientHandler()
@@ -21,14 +33,45 @@ namespace FootballClient.DataAccess
             _httpClient = new HttpClient(_httpClientHandler);
         }
 
-        public async Task<T> SendMessageAsync<T>(HttpRequestMessage requestMessage, IParserStrategy<T> parser)
+        public async Task<T> SendMessageAsync<T>(HttpRequestMessage requestMessage, IParserStrategy<T> parser, DataAccessMode mode = DataAccessMode.Server)
         {
-            using (var httpResult = await _httpClient.SendAsync(requestMessage))
+            return await DetermineFunctions<T>(requestMessage, parser, mode);
+        }
+
+        private IObservable<T> DetermineFunctions<T>(HttpRequestMessage requestMessage, IParserStrategy<T> parser, DataAccessMode mode = DataAccessMode.Server)
+        {
+            var key = Utility.Md5Calculator.ComputeMd5(requestMessage.RequestUri.OriginalString);
+
+            IObservable<T> observable = null;
+            switch (mode)
             {
-                var data = await httpResult.Content.ReadAsStringAsync();
-                var parsedData = parser.Parse(data);
-                return parsedData;
+                case DataAccessMode.Server:
+                    observable = BlobCache.LocalMachine.GetAndUpdateObject(key, 
+                                                                           () => FetchObservable(requestMessage, parser),
+                                                                           DateTimeOffset.UtcNow.AddMinutes(2));
+                    break;
+                case DataAccessMode.Cache:
+                    observable = BlobCache.LocalMachine.GetObject<T>(key)
+                                                       .Catch(Observable.Return(default(T)));
+                    break;
+                default:
+                    break;
             }
+
+            return observable;
+        }
+
+        private IObservable<T> FetchObservable<T>(HttpRequestMessage requestMessage, IParserStrategy<T> parser)
+        {
+            return Task.Run(async () =>
+            {
+                using (var httpResult = await _httpClient.SendAsync(requestMessage))
+                {
+                    var data = await httpResult.Content.ReadAsStringAsync();
+                    var parsedData = parser.Parse(data);
+                    return parsedData;
+                }
+            }).ToObservable();
         }
     }
 }

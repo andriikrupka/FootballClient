@@ -81,7 +81,7 @@ namespace FootballClient.DataAccess.Providers
         {
             _restClient = restClient;
         }
-        public Task<List<FeedItem>> LoadFeedNewsAsync(FeedItem lastFeedItem = null, string filterCode = "")
+        public Task<List<FeedItem>> LoadFeedNewsAsync(FeedItem lastFeedItem = null, string filterCode = "", DataAccessMode mode = DataAccessMode.Server)
         {
             var request = new HttpRequestMessage();
             var parser = new RssFeedParser();
@@ -100,7 +100,7 @@ namespace FootballClient.DataAccess.Providers
             }
             request.RequestUri = uriBuilder.BuildParametersUri();
 
-            return _restClient.SendMessageAsync(request, parser);
+            return _restClient.SendMessageAsync(request, parser, mode);
         }
 
         public Task<ResponseCategory> LoadFeedCategoriesAsync()
