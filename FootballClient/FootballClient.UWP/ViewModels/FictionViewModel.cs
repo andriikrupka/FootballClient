@@ -5,6 +5,7 @@ using FootballClient.Models;
 using FootballClient.DataAccess.Providers;
 using System.Collections.Generic;
 using System;
+using FootballClient.DataAccess;
 
 namespace FootballClient.UWP.ViewModels
 {
@@ -43,7 +44,11 @@ namespace FootballClient.UWP.ViewModels
             }
             catch (System.Exception)
             {
-
+                var response = await _fictionProvider.LoadFictionAsync(FeedItems.LastOrDefault(), Category.Code, DataAccessMode.Cache);
+                if (response != null)
+                {
+                    items.AddRange(response);
+                }
                 IsError = true;
 
             }

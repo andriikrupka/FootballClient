@@ -5,6 +5,8 @@ using System.Threading.Tasks;
 using System.Collections.Generic;
 using FootballClient.DataAccess.Providers;
 using System.Diagnostics;
+using System.Reactive.Linq;
+using System.Reactive.Subjects;
 
 namespace FootballClient.UWP.ViewModels
 {
@@ -54,12 +56,18 @@ namespace FootballClient.UWP.ViewModels
 
             try
             {
-                var response = await _feedNewsProvider.LoadFeedNewsAsync(FeedItems.LastOrDefault(), this.Category.Code);
+                var response = await _feedNewsProvider.LoadFeedNewsAsync(FeedItems.LastOrDefault(), Category.Code);
                 items.AddRange(response);
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-                IsError = true;
+                var response = await _feedNewsProvider.LoadFeedNewsAsync(FeedItems.LastOrDefault(), Category.Code, DataAccess.DataAccessMode.Cache);
+                if (response != null)
+                {
+                    items.AddRange(response);
+                }
+
+                //IsError = true;
             }
 
             //foreach (var item in items)
