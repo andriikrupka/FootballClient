@@ -81,6 +81,7 @@ namespace FootballClient.DataAccess.Providers
         {
             _restClient = restClient;
         }
+
         public Task<List<FeedItem>> LoadFeedNewsAsync(FeedItem lastFeedItem = null, string filterCode = "", DataAccessMode mode = DataAccessMode.Server)
         {
             var request = new HttpRequestMessage();

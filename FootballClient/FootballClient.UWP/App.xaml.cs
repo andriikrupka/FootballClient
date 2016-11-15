@@ -53,6 +53,8 @@ namespace FootballClient.UWP
             Container.RegisterType<FeedNewsProvider>();
             Container.RegisterType<FictionProvider>();
             Container.RegisterType<AuthorsProvider>();
+            Container.RegisterType<CommentsProvider>();
+
             Container.RegisterType<CommonViewModel>(new ContainerControlledLifetimeManager());
             Container.RegisterType<NewsListViewModel>();
             Container.RegisterType<FictionListViewModel>();
