@@ -5,8 +5,9 @@ namespace FootballClient.UWP
     {
         public const string Main = "Main";
         public const string NewsDetails = "NewsDetails";
-        public static string Matches = "Matches";
-        public static string Photos = "Photos";
-        public static string Tournaments = "Tournaments";
+        public const string Matches = "Matches";
+        public const string Photos = "Photos";
+        public const string Tournaments = "Tournaments";
+        public const string Comments = "Comments";
     }
 }

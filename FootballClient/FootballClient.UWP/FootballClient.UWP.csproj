@@ -128,6 +128,7 @@
     <Compile Include="ViewModels\AuthorsListViewModel.cs" />
     <Compile Include="ViewModels\AuthorsViewModel.cs" />
     <Compile Include="ViewModels\BaseViewModel.cs" />
+    <Compile Include="ViewModels\CommentsPageViewModel.cs" />
     <Compile Include="ViewModels\CommentsViewModel.cs" />
     <Compile Include="ViewModels\CommonViewModel.cs" />
     <Compile Include="ViewModels\FictionListViewModel.cs" />
@@ -137,6 +138,9 @@
     <Compile Include="ViewModels\NewsDetailsPageViewModel.cs" />
     <Compile Include="ViewModels\NewsListViewModel.cs" />
     <Compile Include="ViewModels\NewsViewModel.cs" />
+    <Compile Include="Views\CommentsPage.xaml.cs">
+      <DependentUpon>CommentsPage.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Views\MainPage.xaml.cs">
       <DependentUpon>MainPage.xaml</DependentUpon>
     </Compile>
@@ -189,6 +193,10 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Page>
+    <Page Include="Views\CommentsPage.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Views\MainPage.xaml">
       <Generator>MSBuild:Compile</Generator>

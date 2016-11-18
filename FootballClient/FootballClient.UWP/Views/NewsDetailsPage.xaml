@@ -20,10 +20,7 @@
         </TransitionCollection>
     </prismMvvm:SessionStateAwarePage.Transitions>
 
-    <Grid>
-        <Grid.Background>
-            <SolidColorBrush Color="#ebebeb"/>
-        </Grid.Background>
+    <Grid Background="#ebebeb">
         <VisualStateManager.VisualStateGroups>
             <VisualStateGroup>
                 <VisualState>
@@ -48,7 +45,6 @@
             </VisualStateGroup>
         </VisualStateManager.VisualStateGroups>
         
-
         <samplesCommon:CompositionImage x:Name="ParallaxingImage"
                                         Background="Gray"
                                         MaxWidth="780"
@@ -160,5 +156,17 @@
                 </Grid>
             </Grid>
         </ScrollViewer>
+
+        <AppBar VerticalAlignment="Bottom"
+                ClosedDisplayMode="Compact">
+            <StackPanel Orientation="Horizontal"
+                        HorizontalAlignment="Right">
+                <AppBarButton Icon="World"
+                              Command="{Binding ViewInWebCommand}"/>
+                <AppBarButton Icon="Comment"
+                              Command="{Binding ViewCommentsCommand}"/>
+            </StackPanel>
+
+        </AppBar>
     </Grid>
 </prismMvvm:SessionStateAwarePage>
