@@ -15,10 +15,10 @@
     x:Name="appShell"
     xmlns:windowsStateTriggers="using:WindowsStateTriggers"
     d:DesignHeight="300"
+    xmlns:controlExtensions="using:FootballClient.UWP.ControlExtensions"
     d:DesignWidth="400">
 
     <UserControl.Resources>
-        
         <Style TargetType="ListViewItem" x:Key="MenuListViewItemExpanded">
             <Setter Property="FontFamily" Value="{ThemeResource ContentControlThemeFontFamily}" />
             <Setter Property="FontSize" Value="{ThemeResource ControlContentThemeFontSize}" />
@@ -867,6 +867,13 @@
         </Style>
     </UserControl.Resources>
 
+    <controlExtensions:KeyListenerExtension.KeyActions>
+        <controlExtensions:KeyListenerCollection>
+            <controlExtensions:KeyListener Command="{x:Bind ViewModel.BackPressedCommand, Mode=OneTime}"
+                                           KeyBehavior="Up"
+                                           Key="Back"/>
+        </controlExtensions:KeyListenerCollection>
+    </controlExtensions:KeyListenerExtension.KeyActions>
     <Grid>
         <VisualStateManager.VisualStateGroups>
             <VisualStateGroup x:Name="VisualStateGroup">
