@@ -82,7 +82,7 @@ namespace FootballClient.DataAccess.Providers
             _restClient = restClient;
         }
 
-        public Task<List<FeedItem>> LoadFeedNewsAsync(FeedItem lastFeedItem = null, string filterCode = "", DataAccessMode mode = DataAccessMode.Server)
+        public Task<List<FeedItem>> LoadFeedNewsAsync(FeedItem lastFeedItem = null, string filterCode = "", RequestAccessMode mode = RequestAccessMode.Server)
         {
             var request = new HttpRequestMessage();
             var parser = new RssFeedParser();

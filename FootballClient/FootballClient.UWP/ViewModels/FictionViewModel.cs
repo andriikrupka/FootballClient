@@ -44,7 +44,7 @@ namespace FootballClient.UWP.ViewModels
             }
             catch (System.Exception)
             {
-                var response = await _fictionProvider.LoadFictionAsync(FeedItems.LastOrDefault(), Category.Code, DataAccessMode.Cache);
+                var response = await _fictionProvider.LoadFictionAsync(FeedItems.LastOrDefault(), Category.Code, RequestAccessMode.Cache);
                 if (response != null)
                 {
                     items.AddRange(response);

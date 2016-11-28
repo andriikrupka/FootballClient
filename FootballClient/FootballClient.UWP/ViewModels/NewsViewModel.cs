@@ -61,7 +61,7 @@ namespace FootballClient.UWP.ViewModels
             }
             catch (Exception ex)
             {
-                var response = await _feedNewsProvider.LoadFeedNewsAsync(FeedItems.LastOrDefault(), Category.Code, DataAccess.DataAccessMode.Cache);
+                var response = await _feedNewsProvider.LoadFeedNewsAsync(FeedItems.LastOrDefault(), Category.Code, DataAccess.RequestAccessMode.Cache);
                 if (response != null)
                 {
                     items.AddRange(response);

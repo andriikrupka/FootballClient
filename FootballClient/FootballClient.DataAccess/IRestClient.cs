@@ -7,7 +7,7 @@ using System.Reactive.Threading.Tasks;
 
 namespace FootballClient.DataAccess
 {
-    public enum DataAccessMode
+    public enum RequestAccessMode
     {
         Server,
 
@@ -16,7 +16,7 @@ namespace FootballClient.DataAccess
 
     public interface IRestClient
     {
-        Task<T> SendMessageAsync<T>(HttpRequestMessage requestMessage, IParserStrategy<T> parser, DataAccessMode mode = DataAccessMode.Server);
+        Task<T> SendMessageAsync<T>(HttpRequestMessage requestMessage, IParserStrategy<T> parser, RequestAccessMode mode = RequestAccessMode.Server);
     }
 
     public class RestClient : IRestClient
@@ -33,24 +33,24 @@ namespace FootballClient.DataAccess
             _httpClient = new HttpClient(_httpClientHandler);
         }
 
-        public async Task<T> SendMessageAsync<T>(HttpRequestMessage requestMessage, IParserStrategy<T> parser, DataAccessMode mode = DataAccessMode.Server)
+        public async Task<T> SendMessageAsync<T>(HttpRequestMessage requestMessage, IParserStrategy<T> parser, RequestAccessMode mode = RequestAccessMode.Server)
         {
             return await DetermineFunctions<T>(requestMessage, parser, mode);
         }
 
-        private IObservable<T> DetermineFunctions<T>(HttpRequestMessage requestMessage, IParserStrategy<T> parser, DataAccessMode mode = DataAccessMode.Server)
+        private IObservable<T> DetermineFunctions<T>(HttpRequestMessage requestMessage, IParserStrategy<T> parser, RequestAccessMode mode = RequestAccessMode.Server)
         {
             var key = Utility.Md5Calculator.ComputeMd5(requestMessage.RequestUri.OriginalString);
 
             IObservable<T> observable = null;
             switch (mode)
             {
-                case DataAccessMode.Server:
+                case RequestAccessMode.Server:
                     observable = BlobCache.LocalMachine.GetAndUpdateObject(key, 
                                                                            () => FetchObservable(requestMessage, parser),
                                                                            DateTimeOffset.UtcNow.AddMinutes(2));
                     break;
-                case DataAccessMode.Cache:
+                case RequestAccessMode.Cache:
                     observable = BlobCache.LocalMachine.GetObject<T>(key)
                                                        .Catch(Observable.Return(default(T)));
                     break;

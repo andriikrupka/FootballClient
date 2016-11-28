@@ -9,9 +9,6 @@ namespace FootballClient.DataAccess.Providers
 {
     public class AuthorsProvider
     {
-        private const string AuthorsPattern = "AuthorsNews_{0}_{1}";
-        private const string AuthorsCategories = "AuthorsCategories";
-
         private readonly IRestClient _restClient;
 
         public AuthorsProvider(IRestClient restClient)
@@ -28,7 +25,7 @@ namespace FootballClient.DataAccess.Providers
             return _restClient.SendMessageAsync(request, parser);
         }
 
-        public Task<List<FeedItem>> LoadAuthorsFeedAsync(FeedItem lastFeedItem = null, string filterCode = "", DataAccessMode mode = DataAccessMode.Server)
+        public Task<List<FeedItem>> LoadAuthorsFeedAsync(FeedItem lastFeedItem = null, string filterCode = "", RequestAccessMode mode = RequestAccessMode.Server)
         {
             var request = new HttpRequestMessage();
             var parser = new RssFeedParser();

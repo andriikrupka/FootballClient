@@ -46,7 +46,7 @@ namespace FootballClient.UWP.ViewModels
 
                 //IsError = true;
 
-                var response = await _authorsProvider.LoadAuthorsFeedAsync(FeedItems.LastOrDefault(), this.Category.Code, DataAccessMode.Cache);
+                var response = await _authorsProvider.LoadAuthorsFeedAsync(FeedItems.LastOrDefault(), this.Category.Code, RequestAccessMode.Cache);
                 if (response != null)
                 {
                     items.AddRange(response);

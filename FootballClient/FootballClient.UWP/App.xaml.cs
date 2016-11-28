@@ -54,12 +54,13 @@ namespace FootballClient.UWP
             Container.RegisterType<FictionProvider>();
             Container.RegisterType<AuthorsProvider>();
             Container.RegisterType<CommentsProvider>();
+            Container.RegisterType<MatchesProvider>();
 
             Container.RegisterType<CommonViewModel>(new ContainerControlledLifetimeManager());
             Container.RegisterType<NewsListViewModel>();
             Container.RegisterType<FictionListViewModel>();
             Container.RegisterType<AuthorsListViewModel>();
-            
+
             ViewModelLocationProvider.SetDefaultViewTypeToViewModelTypeResolver(viewType =>
             {
                 var viewModelTypeName = string.Format(CultureInfo.InvariantCulture, "FootballClient.UWP.ViewModels.{0}ViewModel, FootballClient.UWP, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null", viewType.Name);
