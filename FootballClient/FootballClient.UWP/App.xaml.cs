@@ -24,7 +24,7 @@ namespace FootballClient.UWP
 {
     sealed partial class App : PrismUnityApplication
     {
-        private IFrameFacade _rootFrameFacade;
+        private readonly CultureInfo _ruInfo = new CultureInfo("ru-RU");
 
         public App()
         {
@@ -34,7 +34,6 @@ namespace FootballClient.UWP
 
         protected override INavigationService OnCreateNavigationService(IFrameFacade rootFrame)
         {
-            _rootFrameFacade = rootFrame;
             Container.RegisterInstance<IFrameFacade>(rootFrame);
             return base.OnCreateNavigationService(rootFrame);
         }
@@ -48,6 +47,9 @@ namespace FootballClient.UWP
 
         protected override Task OnInitializeAsync(IActivatedEventArgs args)
         {
+            CultureInfo.CurrentCulture = _ruInfo;
+            CultureInfo.CurrentUICulture = _ruInfo;
+
             Container.RegisterInstance<IEventAggregator>(new EventAggregator());
             Container.RegisterInstance<IRestClient>(new RestClient());
             Container.RegisterType<FeedNewsProvider>();

@@ -135,6 +135,7 @@
     <Compile Include="ViewModels\FictionListViewModel.cs" />
     <Compile Include="ViewModels\FictionViewModel.cs" />
     <Compile Include="ViewModels\MainPageViewModel.cs" />
+    <Compile Include="ViewModels\MatchesPageViewModel.cs" />
     <Compile Include="ViewModels\Messages\BusyCountMessage.cs" />
     <Compile Include="ViewModels\NewsDetailsPageViewModel.cs" />
     <Compile Include="ViewModels\NewsListViewModel.cs" />
