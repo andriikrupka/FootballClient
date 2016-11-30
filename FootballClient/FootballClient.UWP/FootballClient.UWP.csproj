@@ -99,6 +99,7 @@
       <DependentUpon>AppShell.xaml</DependentUpon>
     </Compile>
     <Compile Include="ControlExtensions\KeyListener.cs" />
+    <Compile Include="ControlExtensions\ListViewBaseExtensions.cs" />
     <Compile Include="Controls\HeaderTappedPivotItem.cs" />
     <Compile Include="Controls\MenuRadioButton.cs" />
     <Compile Include="Controls\NavigationMenuBar.xaml.cs">

@@ -7,6 +7,7 @@
     xmlns:uwpUIToolkit="using:Microsoft.Toolkit.Uwp.UI.Controls"
     xmlns:prismMvvm="using:Prism.Windows.Mvvm"
     xmlns:controls="using:FootballClient.UWP.Controls"
+    xmlns:controlsExtensions="using:FootballClient.UWP.ControlExtensions"
     prismMvvm:ViewModelLocator.AutoWireViewModel="True"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     NavigationCacheMode="Required"
@@ -100,16 +101,13 @@
         <GroupStyle x:Key="MathcGroupStyle">
             <GroupStyle.HeaderContainerStyle>
                 <Style TargetType="ListViewHeaderItem">
+                    <Setter Property="BorderBrush" Value="{StaticResource GreenBrush}"/>
                     <Setter Property="HorizontalContentAlignment" Value="Stretch" />
                 </Style>
             </GroupStyle.HeaderContainerStyle>
             <GroupStyle.HeaderTemplate>
                 <DataTemplate>
-                    <Border BorderBrush="{StaticResource GreenBrush}"
-                        Margin="0,23,0,0"
-                        HorizontalAlignment="Stretch"
-                        BorderThickness="0,0,0,1">
-                        <Grid HorizontalAlignment="Stretch"
+                     <Grid HorizontalAlignment="Stretch"
                           Margin="0,0,0,4">
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition/>
@@ -129,7 +127,6 @@
                                    Opacity="0.6"
                                    Foreground="#666666"/>
                         </Grid>
-                    </Border>
                 </DataTemplate>
             </GroupStyle.HeaderTemplate>
         </GroupStyle>
@@ -198,6 +195,9 @@
 
             <ListView Grid.Row="1"
                       ItemTemplate="{StaticResource MatchDataTemplate}"
+                      IsItemClickEnabled="True"
+                      SelectionMode="None"
+                      controlsExtensions:ListViewBaseExtensions.ItemClickCommand="{Binding ViewDetailsCommand}"
                       ItemsSource="{x:Bind GroupedElectViewSource.View, Mode=OneWay}">
                 <ListView.ItemContainerStyle>
                     <Style TargetType="ListViewItem">

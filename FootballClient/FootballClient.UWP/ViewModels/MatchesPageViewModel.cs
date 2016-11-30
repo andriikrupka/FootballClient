@@ -32,6 +32,12 @@ namespace FootballClient.UWP.ViewModels
         {
             _matchesProvider = matchesProvider;
             Championats = new List<Championat>();
+            ViewDetailsCommand = new DelegateCommand<GameList>(ViewDetailsExecute);
+        }
+
+        private void ViewDetailsExecute(GameList obj)
+        {
+            
         }
 
         public DelegateCommand RefreshCommand { get; private set; }
