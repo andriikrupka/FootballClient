@@ -26,10 +26,10 @@ namespace FootballClient.UWP.ViewModels
         {
             _feedNewsProvider = feedNewsProvider;
             Category = category;
-            FeedItems = new IncrementalObservableCollection<FeedItem>(LoadMoreItemsAsync);
+            FeedItems = new IncrementalObservableCollection<News>(LoadMoreItemsAsync);
         }
 
-        public IncrementalObservableCollection<FeedItem> FeedItems { get; set; }
+        public IncrementalObservableCollection<News> FeedItems { get; set; }
         public Category Category { get; }
 
         public bool IsError { get; set; }
@@ -46,26 +46,28 @@ namespace FootballClient.UWP.ViewModels
             BusyCount--;
         }
 
-        private async Task<IList<FeedItem>> LoadMoreItemsAsync()
+        private async Task<IList<News>> LoadMoreItemsAsync()
         {
             BusyCount++;
 
             IsError = false;
 
-            var items = new List<FeedItem>();
+            var items = new List<News>();
+            var lastItem = FeedItems.LastOrDefault();
+            var dateTime = lastItem == null ? DateTimeOffset.Now : DateTimeOffset.Parse(lastItem.DatePublish);
 
             try
             {
-                var response = await _feedNewsProvider.LoadFeedNewsAsync(FeedItems.LastOrDefault(), Category.Code);
+                var response = await _feedNewsProvider.LoadNewsAsync(dateTime, Category.Code);
                 items.AddRange(response);
             }
             catch (Exception ex)
             {
-                var response = await _feedNewsProvider.LoadFeedNewsAsync(FeedItems.LastOrDefault(), Category.Code, DataAccess.RequestAccessMode.Cache);
-                if (response != null)
-                {
-                    items.AddRange(response);
-                }
+                //var response = await _feedNewsProvider.LoadFeedNewsAsync(FeedItems.LastOrDefault(), Category.Code, DataAccess.RequestAccessMode.Cache);
+                //if (response != null)
+                //{
+                //    items.AddRange(response);
+                //}
 
                 //IsError = true;
             }

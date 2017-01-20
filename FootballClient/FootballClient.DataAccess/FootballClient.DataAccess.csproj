@@ -67,6 +67,7 @@
     <Compile Include="Providers\ImagesProvider.cs" />
     <Compile Include="Providers\MatchesProvider.cs" />
     <Compile Include="Providers\MenuProvider.cs" />
+    <Compile Include="Providers\ParameterUriBuilder.cs" />
     <Compile Include="Providers\PhotosProvider.cs" />
     <Compile Include="Providers\RateProvider.cs" />
     <Compile Include="Providers\ScheduleProvider.cs" />

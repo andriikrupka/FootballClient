@@ -16,7 +16,41 @@ namespace FootballClient.DataAccess
 
     public interface IRestClient
     {
-        Task<T> SendMessageAsync<T>(HttpRequestMessage requestMessage, IParserStrategy<T> parser, RequestAccessMode mode = RequestAccessMode.Server);
+        Task<T> SendMessageAsync<T>(HttpRequestMessage requestMessage, IParserStrategy<T> parser, RequestAccessMode mode = RequestAccessMode.Server, Func<DateTimeOffset, bool> fetchPredicate = null);
+        Task<T> SendMessageAsync<T>(RequestSettings<T> settings);
+    }
+
+    public class RequestSettings<T>
+    {
+        public HttpRequestMessage RequestMessage { get; private set; }
+        public RequestAccessMode Mode { get; private set; }
+        public IParserStrategy<T> Parser { get; private set; }
+
+        public Func<DateTimeOffset, bool> FetchPredicate { get; private set; }
+
+        public RequestSettings<T> AddMode(RequestAccessMode mode)
+        {
+            Mode = mode;
+            return this;
+        }
+
+        public RequestSettings<T> AddRequestMessage(HttpRequestMessage requestMessage)
+        {
+            RequestMessage = requestMessage;
+            return this;
+        }
+
+        public RequestSettings<T> AddParser(IParserStrategy<T> parser)
+        {
+            Parser = parser;
+            return this;
+        }
+
+        public RequestSettings<T> AddFetchPredicate(Func<DateTimeOffset, bool> fetchPredicate)
+        {
+            FetchPredicate = fetchPredicate;
+            return this;
+        }
     }
 
     public class RestClient : IRestClient
@@ -33,12 +67,17 @@ namespace FootballClient.DataAccess
             _httpClient = new HttpClient(_httpClientHandler);
         }
 
-        public async Task<T> SendMessageAsync<T>(HttpRequestMessage requestMessage, IParserStrategy<T> parser, RequestAccessMode mode = RequestAccessMode.Server)
+        public Task<T> SendMessageAsync<T>(RequestSettings<T> settings)
         {
-            return await DetermineFunctions<T>(requestMessage, parser, mode);
+            return SendMessageAsync<T>(settings.RequestMessage, settings.Parser, settings.Mode, settings.FetchPredicate);
         }
 
-        private IObservable<T> DetermineFunctions<T>(HttpRequestMessage requestMessage, IParserStrategy<T> parser, RequestAccessMode mode = RequestAccessMode.Server)
+        public async Task<T> SendMessageAsync<T>(HttpRequestMessage requestMessage, IParserStrategy<T> parser, RequestAccessMode mode = RequestAccessMode.Server, Func<DateTimeOffset, bool> fetchPredicate = null)
+        {
+            return await DetermineFunctions<T>(requestMessage, parser, mode, fetchPredicate);
+        }
+
+        private IObservable<T> DetermineFunctions<T>(HttpRequestMessage requestMessage, IParserStrategy<T> parser, RequestAccessMode mode = RequestAccessMode.Server, Func<DateTimeOffset, bool> fetchPredicate = null)
         {
             var key = Utility.Md5Calculator.ComputeMd5(requestMessage.RequestUri.OriginalString);
 
@@ -47,11 +86,15 @@ namespace FootballClient.DataAccess
             {
                 case RequestAccessMode.Server:
                     observable = BlobCache.LocalMachine.GetAndUpdateObject(key, 
-                                                                           () => FetchObservable(requestMessage, parser),
-                                                                           DateTimeOffset.UtcNow.AddMinutes(2));
+                                                                           () => FetchObservable(requestMessage, parser));
                     break;
                 case RequestAccessMode.Cache:
-                    observable = BlobCache.LocalMachine.GetObject<T>(key)
+                    observable = BlobCache.LocalMachine.GetAndFetchLatest<T>(key, () => FetchObservable(requestMessage, parser), date =>
+
+                    {
+                        var res = fetchPredicate?.Invoke(date) ?? true;
+                        return res;
+                    })
                                                        .Catch(Observable.Return(default(T)));
                     break;
                 default:

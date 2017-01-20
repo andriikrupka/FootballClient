@@ -14,6 +14,40 @@
     mc:Ignorable="d">
 
     <prismMvvm:SessionStateAwarePage.Resources>
+        <DataTemplate x:DataType="models:News"
+                      x:Name="NewsTemplate">
+            <Grid Height="92">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="117"/>
+                        <ColumnDefinition />
+                    </Grid.ColumnDefinitions>
+
+                    <Image Source="{x:Bind ImageUrl, TargetNullValue='/Assets/default_image.jpg'}"
+                           Stretch="UniformToFill"/>
+                    <Grid Grid.Column="1"
+                          Margin="12,0,0,0">
+
+                        <TextBlock MaxLines="2"
+                                   Margin="0,-2,0,0"
+                                   TextWrapping="Wrap"
+                                   TextTrimming="CharacterEllipsis"
+                                   Foreground="#212121"
+                                   FontSize="22"
+                                   FontFamily="{ThemeResource PhoneFontFamilySemiLight}"
+                                   LineStackingStrategy="BlockLineHeight"
+                                   LineHeight="26"
+                                   Text="{x:Bind Title}"/>
+
+                        <TextBlock Text="{x:Bind DatePublish}"
+                                   Margin="0,0,0,12"
+                                   VerticalAlignment="Bottom"
+                                   Foreground="#A8A8A8"
+                                   FontSize="17"/>
+                    </Grid>
+                </Grid>
+            </Grid>
+        </DataTemplate>
         <DataTemplate x:DataType="models:FeedItem"
                       x:Name="FeedItemTemplate">
             <Grid Height="92">
@@ -173,6 +207,7 @@
                         <uwpUIToolkit:AdaptiveGridView ItemsSource="{Binding NewsListViewModel.SelectedViewModel.FeedItems}"
                                                        Grid.Row="1"
                                                        Style="{StaticResource AdaptiveGridViewSetyle}"
+                                                       ItemTemplate="{StaticResource NewsTemplate}"
                                                        ItemClickCommand="{Binding ViewDetailsCommand}"/>
 
 

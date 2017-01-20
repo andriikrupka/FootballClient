@@ -46,6 +46,8 @@
     <Compile Include="Comments\PageComment.cs" />
     <Compile Include="Comments\Quote.cs" />
     <Compile Include="Core\BindableObject.cs" />
+    <Compile Include="News\News.cs" />
+    <Compile Include="News\NewsResponse.cs" />
     <Compile Include="ObservableRangeCollection.cs" />
     <Compile Include="ExpirationRate.cs" />
     <Compile Include="Interfaces\IDataBaseProvider.cs" />

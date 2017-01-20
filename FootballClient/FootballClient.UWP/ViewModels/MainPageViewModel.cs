@@ -5,6 +5,8 @@ using Prism.Windows.Navigation;
 using FootballClient.Models;
 using Prism.Commands;
 using Prism.Windows.AppModel;
+using Newtonsoft.Json;
+using FootballClient.DataAccess.Providers;
 
 namespace FootballClient.UWP.ViewModels
 {

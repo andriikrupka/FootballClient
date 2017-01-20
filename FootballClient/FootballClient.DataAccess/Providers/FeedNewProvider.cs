@@ -9,108 +9,171 @@ using System.Collections;
 using System.Text;
 using System.Linq;
 using System.Globalization;
+using System.Diagnostics;
+using System.Reactive.Threading.Tasks;
+using System.Reactive.Linq;
+using FootballClient.DataAccess.Parsers;
+using System.Xml.Serialization;
 
 namespace FootballClient.DataAccess.Providers
 {
-    public class ParameterUriBuilder : IEnumerable<KeyValuePair<string, string>>
+    public class CategoryFinder
     {
-        private string _baseAddress;
-        private readonly List<KeyValuePair<string, string>> _collection;
+        public string CategoryName { get; set; }
 
-        public ParameterUriBuilder(string baseAddress)
+        public string PageId { get; set; }
+
+        public override bool Equals(object obj)
         {
-            _baseAddress = baseAddress;
-            _collection = new List<KeyValuePair<string, string>>();
+            var isEquals = false;
+            var other = obj as CategoryFinder;
+            isEquals = other?.PageId?.Equals(this.PageId) ?? false;
+
+            return false;
         }
 
-        public void Add(string key, string value)
+        public override int GetHashCode()
         {
-            _collection.Add(new KeyValuePair<string, string>(key, value));
-        }
-
-        public IEnumerator<KeyValuePair<string, string>> GetEnumerator()
-        {
-            return _collection.GetEnumerator();
-        }
-
-        IEnumerator IEnumerable.GetEnumerator()
-        {
-            return ((IEnumerable)_collection).GetEnumerator();
-        }
-
-        public Uri BuildParametersUri()
-        {
-            var linkBuilder = new StringBuilder();
-            if (_collection.Any())
-            {
-
-                if (!_baseAddress.Contains("?"))
-                {
-                    var lastLinkSymbol = _baseAddress[_baseAddress.Length - 1];
-
-                    if (lastLinkSymbol == '/')
-                    {
-                        _baseAddress = _baseAddress.Substring(0, _baseAddress.Length - 1);
-                    }
-
-                    linkBuilder.Append("?");
-                }
-                else
-                {
-                    linkBuilder.Append("&");
-                }
-
-                foreach (var parameter in _collection)
-                {
-                    linkBuilder.AppendFormat(CultureInfo.InvariantCulture, parameter.Key + "=" + Uri.EscapeDataString(parameter.Value) + "&");
-                }
-
-                linkBuilder.Remove(linkBuilder.Length - 1, 1);
-            }
-
-            return new Uri(_baseAddress + linkBuilder.ToString());
+            return this.PageId?.GetHashCode() ?? 0;
         }
     }
+
     public class FeedNewsProvider
     {
-        private const string FeedNewsPattern = "FeedNews_{0}_{1}";
-        private const string FeedCategories = "FeedCategories";
         private readonly IRestClient _restClient;
+
+        //public static List<CategoryFinder> CategoryFinderCollection = new List<CategoryFinder>();
 
         public FeedNewsProvider(IRestClient restClient)
         {
             _restClient = restClient;
         }
 
-        public Task<List<FeedItem>> LoadFeedNewsAsync(FeedItem lastFeedItem = null, string filterCode = "", RequestAccessMode mode = RequestAccessMode.Server)
-        {
-            var request = new HttpRequestMessage();
-            var parser = new RssFeedParser();
 
-            var uriBuilder = new ParameterUriBuilder("http://football.ua/handlers/stanfy/news.ashx");
-            if (lastFeedItem != null)
+
+        public async Task<IList<News>> LoadNewsAsync(DateTimeOffset dateTime, string code)
+        {
+            var uriBuider = new ParameterUriBuilder("http://services.football.ua/api/News/GetArchive");
+            uriBuider.Add("pageId", code);
+            uriBuider.Add("teamId", "0");
+            uriBuider.Add("datePublish", dateTime.ToString("yyyy-MM-ddTHH:mm:sszzz", CultureInfo.InvariantCulture));
+            uriBuider.Add("count", "25");
+            uriBuider.Add("imageFormat", "s318x171");
+            uriBuider.Add("callback", "");
+            uriBuider.Add("_1480515720809", "");
+            var requestMessage = new HttpRequestMessage(HttpMethod.Get, uriBuider.BuildParametersUri());
+            var task = await _restClient.SendMessageAsync(requestMessage, new JsonParser<NewsResponse>()).ToObservable();
+
+            try
             {
-                var dateTimeOffset = lastFeedItem.Date.ToString("dd.MM.yyyy HH:mm:sszzz");
-                    dateTimeOffset = dateTimeOffset.Remove(dateTimeOffset.LastIndexOf(":", StringComparison.Ordinal), 1);
-                uriBuilder.Add("before", dateTimeOffset);
+                var fillDetailsTask = task.News.Select(x => GetDetails(x.Id, x.DateTimeOffsetPublish));
+                var rsss = await Task.WhenAll(fillDetailsTask);
+                //foreach(var item in task.News.Where(x=> CategoryFinderCollection.FirstOrDefault(c=> c.PageId == x.PageId.ToString()) == null))
+                //{
+                //    var rssItem = rsss.FirstOrDefault(x => x.channel.item.Id == item.Id.ToString());
+                //    if (rssItem != null)
+                //    {
+                //        CategoryFinderCollection.Add(new CategoryFinder()
+                //        {
+                //            PageId = item.PageId.ToString(),
+                //            CategoryName = rssItem.channel.item.category
+                //        });
+                //    }
+                //}
+            }
+            catch (Exception ex)
+            {
+
             }
 
-            if (!string.IsNullOrEmpty(filterCode))
-            {
-                uriBuilder.Add("filterCode", filterCode);
-            }
-            request.RequestUri = uriBuilder.BuildParametersUri();
-
-            return _restClient.SendMessageAsync(request, parser, mode);
+            return task.News;
         }
 
-        public Task<ResponseCategory> LoadFeedCategoriesAsync()
+        public Task<rss> GetDetails(int id, DateTimeOffset publishedDate)
         {
-            var request = new HttpRequestMessage();
-            var parser = new XmlParser<ResponseCategory>();
-            request.RequestUri = new Uri("http://football.ua/handlers/stanfy/newsfilters.ashx?type=lenta");
+            var uriBuilder = new ParameterUriBuilder("http://football.ua/hnd/Android/NewsItem.ashx");
+            uriBuilder.Add("news_id", id.ToString());
+            var requestMessage = new HttpRequestMessage(HttpMethod.Get, uriBuilder.BuildParametersUri());
+            var settings = new RequestSettings<rss>();
+            settings.AddParser(new XmlParser<rss>())
+                    .AddRequestMessage(requestMessage)
+                    .AddMode(RequestAccessMode.Server)
+                    .AddFetchPredicate(cachedDate =>
+            {
+                var needFetch = false;
+                var diffBetweenNow = cachedDate - DateTimeOffset.UtcNow;
+                var isFreshCache = Math.Abs(diffBetweenNow.TotalMinutes) < 60;
+                if (isFreshCache)
+                {
+                    var absMinutes = Math.Abs((publishedDate.UtcDateTime - DateTimeOffset.UtcNow).TotalMinutes);
+                    if (absMinutes > 100)
+                    {
+                        needFetch = false;
+                    }
+                    else
+                    {
+                        needFetch = true;
+                    }
+                }
+                else
+                {
+                    var diffBetweenPublished = publishedDate.UtcDateTime - cachedDate;
+                    needFetch = Math.Abs(diffBetweenPublished.TotalMinutes) < 60;
+                }
 
-            return _restClient.SendMessageAsync(request, parser);
+                return needFetch;
+            });
+
+            var result = _restClient.SendMessageAsync<rss>(settings);
+
+            return result;
         }
+    }
+
+    [XmlType(AnonymousType = true)]
+    [XmlRoot(Namespace = "", IsNullable = false)]
+    public partial class rss
+    {
+        public rssChannel channel { get; set; }
+    }
+
+    [XmlType(AnonymousType = true)]
+    public partial class rssChannel
+    {
+        public rssChannelItem item { get; set; }
+    }
+
+    [XmlType(AnonymousType = true)]
+    public partial class rssChannelItem
+    {
+        public string title { get; set; }
+
+        public string link { get; set; }
+
+        public uint date { get; set; }
+
+        public string description { get; set; }
+
+        public string category { get; set; }
+
+        public string article { get; set; }
+
+        public rssChannelItemImg img { get; set; }
+
+        [XmlAttribute()]
+        public string type { get; set; }
+    }
+
+    [XmlType(AnonymousType = true)]
+    public partial class rssChannelItemImg
+    {
+        [XmlAttribute()]
+        public ushort height { get; set; }
+
+        [XmlAttribute()]
+        public ushort width { get; set; }
+
+        [XmlText()]
+        public string Value { get; set; }
     }
 }

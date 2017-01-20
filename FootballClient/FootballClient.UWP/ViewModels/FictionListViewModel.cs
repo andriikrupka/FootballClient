@@ -16,7 +16,6 @@ namespace FootballClient.UWP.ViewModels
         {
             _fictionProvider = fictionProvider;
             FictionsViewModels = new ObservableRangeCollection<FictionViewModel>();
-            
         }
 
         public ObservableRangeCollection<FictionViewModel> FictionsViewModels { get; set; }
