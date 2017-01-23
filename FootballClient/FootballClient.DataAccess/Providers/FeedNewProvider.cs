@@ -42,14 +42,12 @@ namespace FootballClient.DataAccess.Providers
     {
         private readonly IRestClient _restClient;
 
-        //public static List<CategoryFinder> CategoryFinderCollection = new List<CategoryFinder>();
+        public static List<CategoryFinder> CategoryFinderCollection = new List<CategoryFinder>();
 
         public FeedNewsProvider(IRestClient restClient)
         {
             _restClient = restClient;
         }
-
-
 
         public async Task<IList<News>> LoadNewsAsync(DateTimeOffset dateTime, string code)
         {
@@ -57,76 +55,60 @@ namespace FootballClient.DataAccess.Providers
             uriBuider.Add("pageId", code);
             uriBuider.Add("teamId", "0");
             uriBuider.Add("datePublish", dateTime.ToString("yyyy-MM-ddTHH:mm:sszzz", CultureInfo.InvariantCulture));
-            uriBuider.Add("count", "25");
+            uriBuider.Add("count", "20");
             uriBuider.Add("imageFormat", "s318x171");
             uriBuider.Add("callback", "");
             uriBuider.Add("_1480515720809", "");
             var requestMessage = new HttpRequestMessage(HttpMethod.Get, uriBuider.BuildParametersUri());
-            var task = await _restClient.SendMessageAsync(requestMessage, new JsonParser<NewsResponse>()).ToObservable();
+            var newsResponse = await _restClient.SendMessageAsync(requestMessage, new JsonParser<NewsResponse>()).ToObservable();
 
             try
             {
-                var fillDetailsTask = task.News.Select(x => GetDetails(x.Id, x.DateTimeOffsetPublish));
+                var fillDetailsTask = newsResponse.News.Select(x => GetDetailsAsync(x.Id, x.DateTimeOffsetPublish, true));
                 var rsss = await Task.WhenAll(fillDetailsTask);
-                //foreach(var item in task.News.Where(x=> CategoryFinderCollection.FirstOrDefault(c=> c.PageId == x.PageId.ToString()) == null))
-                //{
-                //    var rssItem = rsss.FirstOrDefault(x => x.channel.item.Id == item.Id.ToString());
-                //    if (rssItem != null)
-                //    {
-                //        CategoryFinderCollection.Add(new CategoryFinder()
-                //        {
-                //            PageId = item.PageId.ToString(),
-                //            CategoryName = rssItem.channel.item.category
-                //        });
-                //    }
-                //}
+
+                foreach (var item in newsResponse.News.Where(x => CategoryFinderCollection.FirstOrDefault(c => c.PageId == x.PageId.ToString()) == null))
+                {
+                    var rssItem = rsss.FirstOrDefault(x => x.id == item.Id.ToString());
+                    if (rssItem != null)
+                    {
+                        CategoryFinderCollection.Add(new CategoryFinder()
+                        {
+                            PageId = item.PageId.ToString(),
+                            CategoryName = rssItem.category
+                        });
+                    }
+                }
             }
             catch (Exception ex)
             {
 
             }
 
-            return task.News;
+            return newsResponse.News;
         }
 
-        public Task<rss> GetDetails(int id, DateTimeOffset publishedDate)
+        public async Task<rssChannelItem> GetDetailsAsync(int id, DateTimeOffset publishedDate, bool requestIfExists = false)
         {
             var uriBuilder = new ParameterUriBuilder("http://football.ua/hnd/Android/NewsItem.ashx");
             uriBuilder.Add("news_id", id.ToString());
             var requestMessage = new HttpRequestMessage(HttpMethod.Get, uriBuilder.BuildParametersUri());
-            var settings = new RequestSettings<rss>();
+            var settings = new RestSettings<rss>();
             settings.AddParser(new XmlParser<rss>())
                     .AddRequestMessage(requestMessage)
-                    .AddMode(RequestAccessMode.Server)
-                    .AddFetchPredicate(cachedDate =>
-            {
-                var needFetch = false;
-                var diffBetweenNow = cachedDate - DateTimeOffset.UtcNow;
-                var isFreshCache = Math.Abs(diffBetweenNow.TotalMinutes) < 60;
-                if (isFreshCache)
-                {
-                    var absMinutes = Math.Abs((publishedDate.UtcDateTime - DateTimeOffset.UtcNow).TotalMinutes);
-                    if (absMinutes > 100)
-                    {
-                        needFetch = false;
-                    }
-                    else
-                    {
-                        needFetch = true;
-                    }
-                }
-                else
-                {
-                    var diffBetweenPublished = publishedDate.UtcDateTime - cachedDate;
-                    needFetch = Math.Abs(diffBetweenPublished.TotalMinutes) < 60;
-                }
+                    .AddMode(RequestAccessMode.Server);
 
-                return needFetch;
+            var result = await _restClient.SendAsync<rss>(settings, tupleData =>
+            {
+                if (!tupleData.Item2.HasValue)
+                    return true; 
+
+                return requestIfExists && Math.Abs((publishedDate.UtcDateTime - tupleData.Item2.Value).TotalDays) < 1;
             });
 
-            var result = _restClient.SendMessageAsync<rss>(settings);
 
-            return result;
+            result.channel.item.id = id.ToString();
+            return result?.channel?.item;
         }
     }
 
@@ -146,6 +128,8 @@ namespace FootballClient.DataAccess.Providers
     [XmlType(AnonymousType = true)]
     public partial class rssChannelItem
     {
+        public string id { get; set; }
+
         public string title { get; set; }
 
         public string link { get; set; }

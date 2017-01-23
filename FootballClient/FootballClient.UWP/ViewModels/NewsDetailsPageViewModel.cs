@@ -8,6 +8,7 @@ using FootballClient.Models;
 using Prism.Windows.AppModel;
 using Prism.Commands;
 using Windows.System;
+using FootballClient.DataAccess.Providers;
 
 namespace FootballClient.UWP.ViewModels
 {
@@ -15,12 +16,15 @@ namespace FootballClient.UWP.ViewModels
     {
         private readonly ISessionStateService _sessionStateService;
         private INavigationService _navigationService;
+        private readonly FeedNewsProvider _feedNewsProvider;
 
         public NewsDetailsPageViewModel(ISessionStateService sessionStateService,
-                                        INavigationService navigationService)
+                                        INavigationService navigationService,
+                                        FeedNewsProvider feedNewsProvider)
         {
             _navigationService = navigationService;
             _sessionStateService = sessionStateService;
+            _feedNewsProvider = feedNewsProvider;
             ViewInWebCommand = new DelegateCommand(ViewInWebExecute);
             ViewCommentsCommand = new DelegateCommand(ViewCommentsExecute);
         }
@@ -30,13 +34,15 @@ namespace FootballClient.UWP.ViewModels
         public DelegateCommand ViewCommentsCommand { get; private set; }
 
         [RestorableState]
-        public FeedItem CurrentNews { get; private set; }
+        public News CurrentNews { get; private set; }
+        public rssChannelItem NewsDetails { get; private set; }
 
-        public override void OnNavigatedTo(NavigatedToEventArgs e, Dictionary<string, object> viewModelState)
+        public override async void OnNavigatedTo(NavigatedToEventArgs e, Dictionary<string, object> viewModelState)
         {
             base.OnNavigatedTo(e, viewModelState);
 
-            CurrentNews = _sessionStateService.SessionState["CurrentNews"] as FeedItem;
+            var news = _sessionStateService.SessionState["CurrentNews"] as News;
+            NewsDetails = await _feedNewsProvider.GetDetailsAsync(news.Id, news.DateTimeOffsetPublish, true);
         }
 
         private void ViewInWebExecute()

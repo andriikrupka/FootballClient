@@ -36,6 +36,12 @@ namespace FootballClient.UWP.Views
         private void ParallaxingImage_SizeChanged(object sender, SizeChangedEventArgs e)
         {
             imageSpaceImitationGrid.Height = ParallaxingImage.ActualHeight;
+            UpdateScalars();
+        }
+
+        private void OnImageSourceChanged(object sender, EventArgs e)
+        {
+            Initialize();
         }
 
         private void NewsDetailsPage_SizeChanged(object sender, RoutedEventArgs e)
@@ -46,8 +52,16 @@ namespace FootballClient.UWP.Views
 
         private async void NewsDetailsPage_Loaded(object sender, Windows.UI.Xaml.RoutedEventArgs e)
         {
+            Initialize();
+        }
+
+        private async void Initialize()
+        {
+            if (ParallaxingImage?.Source == null)
+                return;
+
             NewsDetailsPage_SizeChanged(null, null);
-            _compositor = ElementCompositionPreview.GetElementVisual(sender as UIElement).Compositor;
+            _compositor = ElementCompositionPreview.GetElementVisual(this).Compositor;
 
             var scrollProperties = ElementCompositionPreview.GetScrollViewerManipulationPropertySet(scrollViewer);
             ParallaxingImage.Brush = await InitializeCrossFadeEffect(ParallaxingImage.Source);

@@ -14,43 +14,35 @@ namespace FootballClient.DataAccess
         Cache
     }
 
-    public interface IRestClient
-    {
-        Task<T> SendMessageAsync<T>(HttpRequestMessage requestMessage, IParserStrategy<T> parser, RequestAccessMode mode = RequestAccessMode.Server, Func<DateTimeOffset, bool> fetchPredicate = null);
-        Task<T> SendMessageAsync<T>(RequestSettings<T> settings);
-    }
-
-    public class RequestSettings<T>
+    public class RestSettings<T>
     {
         public HttpRequestMessage RequestMessage { get; private set; }
         public RequestAccessMode Mode { get; private set; }
         public IParserStrategy<T> Parser { get; private set; }
 
-        public Func<DateTimeOffset, bool> FetchPredicate { get; private set; }
-
-        public RequestSettings<T> AddMode(RequestAccessMode mode)
+        public RestSettings<T> AddMode(RequestAccessMode mode)
         {
             Mode = mode;
             return this;
         }
 
-        public RequestSettings<T> AddRequestMessage(HttpRequestMessage requestMessage)
+        public RestSettings<T> AddRequestMessage(HttpRequestMessage requestMessage)
         {
             RequestMessage = requestMessage;
             return this;
         }
 
-        public RequestSettings<T> AddParser(IParserStrategy<T> parser)
+        public RestSettings<T> AddParser(IParserStrategy<T> parser)
         {
             Parser = parser;
             return this;
         }
+    }
 
-        public RequestSettings<T> AddFetchPredicate(Func<DateTimeOffset, bool> fetchPredicate)
-        {
-            FetchPredicate = fetchPredicate;
-            return this;
-        }
+    public interface IRestClient
+    {
+        Task<T> SendAsync<T>(RestSettings<T> settigns, Func<Tuple<T, DateTimeOffset?>, bool> fetchPredicate);
+        Task<T> SendMessageAsync<T>(HttpRequestMessage request, IParserStrategy<T> parser, RequestAccessMode mode = RequestAccessMode.Server);
     }
 
     public class RestClient : IRestClient
@@ -67,51 +59,45 @@ namespace FootballClient.DataAccess
             _httpClient = new HttpClient(_httpClientHandler);
         }
 
-        public Task<T> SendMessageAsync<T>(RequestSettings<T> settings)
+        public Task<T> SendMessageAsync<T>(HttpRequestMessage request, IParserStrategy<T> parser, RequestAccessMode mode = RequestAccessMode.Server)
         {
-            return SendMessageAsync<T>(settings.RequestMessage, settings.Parser, settings.Mode, settings.FetchPredicate);
+            return SendAsync<T>(new RestSettings<T>().AddParser(parser).AddRequestMessage(request).AddMode(mode), null);
         }
 
-        public async Task<T> SendMessageAsync<T>(HttpRequestMessage requestMessage, IParserStrategy<T> parser, RequestAccessMode mode = RequestAccessMode.Server, Func<DateTimeOffset, bool> fetchPredicate = null)
+        public async Task<T> SendAsync<T>(RestSettings<T> settigns, Func<Tuple<T, DateTimeOffset?>, bool> fetchPredicate)
         {
-            return await DetermineFunctions<T>(requestMessage, parser, mode, fetchPredicate);
-        }
+            var key = Utility.Md5Calculator.ComputeMd5(settigns.RequestMessage.RequestUri.OriginalString);
 
-        private IObservable<T> DetermineFunctions<T>(HttpRequestMessage requestMessage, IParserStrategy<T> parser, RequestAccessMode mode = RequestAccessMode.Server, Func<DateTimeOffset, bool> fetchPredicate = null)
-        {
-            var key = Utility.Md5Calculator.ComputeMd5(requestMessage.RequestUri.OriginalString);
-
-            IObservable<T> observable = null;
-            switch (mode)
+            var createdItem = await BlobCache.LocalMachine.GetObjectCreatedAt<T>(key);
+            if (createdItem == null)
             {
-                case RequestAccessMode.Server:
-                    observable = BlobCache.LocalMachine.GetAndUpdateObject(key, 
-                                                                           () => FetchObservable(requestMessage, parser));
-                    break;
-                case RequestAccessMode.Cache:
-                    observable = BlobCache.LocalMachine.GetAndFetchLatest<T>(key, () => FetchObservable(requestMessage, parser), date =>
 
-                    {
-                        var res = fetchPredicate?.Invoke(date) ?? true;
-                        return res;
-                    })
-                                                       .Catch(Observable.Return(default(T)));
-                    break;
-                default:
-                    break;
             }
 
-            return observable;
+            var value = await BlobCache.LocalMachine.GetOrCreateObject<T>(key, () => default(T), DateTimeOffset.Now.AddDays(10));
+            if (settigns.Mode == RequestAccessMode.Cache)
+            {
+                return value;
+            }
+
+            var reload = fetchPredicate?.Invoke(Tuple.Create(value, createdItem)) ?? true;
+            if (reload)
+            {
+                value = await FetchData(settigns);
+                await BlobCache.LocalMachine.InsertObject(key, value, DateTimeOffset.Now.AddDays(10));
+            }
+
+            return value;
         }
 
-        private IObservable<T> FetchObservable<T>(HttpRequestMessage requestMessage, IParserStrategy<T> parser)
+        public IObservable<T> FetchData<T>(RestSettings<T> settigns)
         {
             return Task.Run(async () =>
             {
-                using (var httpResult = await _httpClient.SendAsync(requestMessage))
+                using (var httpResult = await _httpClient.SendAsync(settigns.RequestMessage))
                 {
                     var data = await httpResult.Content.ReadAsStringAsync();
-                    var parsedData = parser.Parse(data);
+                    var parsedData = settigns.Parser.Parse(data);
                     return parsedData;
                 }
             }).ToObservable();

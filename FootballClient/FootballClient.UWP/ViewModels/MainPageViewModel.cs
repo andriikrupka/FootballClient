@@ -34,7 +34,7 @@ namespace FootballClient.UWP.ViewModels
             _authorsListViewModel = authorsListViewModel;
             _newsListViewModel = newsListViewModel;
             _commonViewModel = commonViewModel;
-            ViewDetailsCommand = new DelegateCommand<FeedItem>(ViewDetailsExecute);
+            ViewDetailsCommand = new DelegateCommand<News>(ViewDetailsExecute);
             RefreshTabCommand = new DelegateCommand(RefreshExecute);
         }
 
@@ -57,7 +57,7 @@ namespace FootballClient.UWP.ViewModels
 
         public int SelectedTabIndex { get; set; }
 
-        public DelegateCommand<FeedItem> ViewDetailsCommand { get; }
+        public DelegateCommand<News> ViewDetailsCommand { get; }
 
         public DelegateCommand RefreshTabCommand { get; }
         public NewsListViewModel NewsListViewModel
@@ -92,7 +92,7 @@ namespace FootballClient.UWP.ViewModels
             }
         }
 
-        private void ViewDetailsExecute(FeedItem item)
+        private void ViewDetailsExecute(News item)
         {
             _sessionStateService.SessionState["CurrentNews"] = item;
             _navigationService.Navigate(NavigationPages.NewsDetails, null);
