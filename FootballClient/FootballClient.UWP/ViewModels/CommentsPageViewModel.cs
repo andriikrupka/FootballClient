@@ -88,7 +88,7 @@ namespace FootballClient.UWP.ViewModels
             LoadPreviousPageCommand.RaiseCanExecuteChanged();
             RefreshCommand.RaiseCanExecuteChanged();
 
-            var commentsResponse = await _commentsProvider.LoadComments(postId, pageIndex, commentType);
+            var commentsResponse = await _commentsProvider.LoadCommentsAsync(postId, pageIndex, commentType);
             if (commentsResponse != null)
             {
                 CurrentIndex = commentsResponse.PagerCurrent;

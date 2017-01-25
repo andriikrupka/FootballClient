@@ -16,14 +16,15 @@ namespace FootballClient.DataAccess.Providers
             _restClient = restClient;
         }
 
-        //http://football.ua/handlers/stanfy/authors.ashx
-        public Task<ResponseCategory> LoadAuthorsCategoriesAsync()
-        {
-            var request = new HttpRequestMessage();
-            var parser = new XmlParser<ResponseCategory>();
-            request.RequestUri = new Uri("http://football.ua/handlers/stanfy/authors.ashx");
-            return _restClient.SendMessageAsync(request, parser);
-        }
+        ////http://football.ua/handlers/stanfy/authors.ashx
+        //public Task<ResponseCategory> LoadAuthorsCategoriesAsync()
+        //{
+        //    var request = new HttpRequestMessage();
+        //    var parser = new XmlParser<ResponseCategory>();
+        //    request.RequestUri = new Uri("http://football.ua/handlers/stanfy/authors.ashx");
+        //    var settings = new RestSettings<>
+        //    return _restClient.SendMessageAsync(request, parser);
+        //}
 
         public Task<List<FeedItem>> LoadAuthorsFeedAsync(FeedItem lastFeedItem = null, string filterCode = "", RequestAccessMode mode = RequestAccessMode.Server)
         {
@@ -44,7 +45,13 @@ namespace FootballClient.DataAccess.Providers
             }
 
             request.RequestUri = requestUriBuilder.BuildParametersUri();
-            return _restClient.SendMessageAsync(request, parser, mode);
+
+            var restSettings = new RestSettings<List<FeedItem>>()
+                                   .AddMode(mode)
+                                   .AddParser(parser)
+                                   .AddRequestMessage(request);
+
+            return _restClient.SendAsync(restSettings, null);
         }
     }
 }

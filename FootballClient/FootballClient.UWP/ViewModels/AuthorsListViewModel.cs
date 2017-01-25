@@ -24,13 +24,13 @@ namespace FootballClient.UWP.ViewModels
         {
             var list = new List<Category>();
 
-            var categoriesResponse = await _authorsProvider.LoadAuthorsCategoriesAsync();
-            if (categoriesResponse != null
-                && categoriesResponse.Data != null && categoriesResponse.Data.FilterParam != null)
-            {
-                list = new List<Category>(categoriesResponse.Data.FilterParam);
-            }
-            else
+            //var categoriesResponse = await _authorsProvider.LoadAuthorsCategoriesAsync();
+            //if (categoriesResponse != null
+            //    && categoriesResponse.Data != null && categoriesResponse.Data.FilterParam != null)
+            //{
+            //    list = new List<Category>(categoriesResponse.Data.FilterParam);
+            //}
+            //else
             {
                 #region Custom
                 list.Add(new Category

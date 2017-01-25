@@ -46,14 +46,25 @@ namespace FootballClient.DataAccess.Providers
             uri.Add("_1413706301734", "");
 
             var requestMessage = new HttpRequestMessage(HttpMethod.Get, uri.BuildParametersUri());
-            return await _restClient.SendMessageAsync<MatchesResponse>(requestMessage, new JsonParser<MatchesResponse>(), mode);
+            var settings = new RestSettings<MatchesResponse>()
+                               .AddMode(mode)
+                               .AddParser(new JsonParser<MatchesResponse>())
+                               .AddRequestMessage(requestMessage);
+
+            return await _restClient.SendAsync<MatchesResponse>(settings, null);
         }
 
         public async Task<MatchDetails> LoadMatchDetailsAsync(RequestAccessMode mode, string detailsLink, int gameId)
         {
             var request = new HttpRequestMessage();
             request.RequestUri = new Uri(detailsLink);
-            return await _restClient.SendMessageAsync(request, new MatchDetailsParser(), mode);
+
+            var settings = new RestSettings<MatchDetails>()
+                               .AddMode(mode)
+                               .AddParser(new MatchDetailsParser())
+                               .AddRequestMessage(request);
+
+            return await _restClient.SendAsync(settings, null);
         }
     }
 }

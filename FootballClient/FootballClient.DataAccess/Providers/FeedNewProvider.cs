@@ -1,15 +1,11 @@
 ﻿using System;
-using FootballClient.DataAccess.Request;
 using FootballClient.DataAccess.Request.Parsers;
 using FootballClient.Models;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using System.Net.Http;
-using System.Collections;
-using System.Text;
 using System.Linq;
 using System.Globalization;
-using System.Diagnostics;
 using System.Reactive.Threading.Tasks;
 using System.Reactive.Linq;
 using FootballClient.DataAccess.Parsers;
@@ -49,7 +45,7 @@ namespace FootballClient.DataAccess.Providers
             _restClient = restClient;
         }
 
-        public async Task<IList<News>> LoadNewsAsync(DateTimeOffset dateTime, string code)
+        public async Task<IList<News>> LoadNewsAsync(DateTimeOffset dateTime, string code, RequestAccessMode mode)
         {
             var uriBuider = new ParameterUriBuilder("http://services.football.ua/api/News/GetArchive");
             uriBuider.Add("pageId", code);
@@ -59,30 +55,21 @@ namespace FootballClient.DataAccess.Providers
             uriBuider.Add("imageFormat", "s318x171");
             uriBuider.Add("callback", "");
             uriBuider.Add("_1480515720809", "");
-            var requestMessage = new HttpRequestMessage(HttpMethod.Get, uriBuider.BuildParametersUri());
-            var newsResponse = await _restClient.SendMessageAsync(requestMessage, new JsonParser<NewsResponse>()).ToObservable();
 
+            var settings = new RestSettings<NewsResponse>();
+            settings.AddMode(mode)
+                    .AddParser(new JsonParser<NewsResponse>())
+                    .AddRequestMessage(new HttpRequestMessage(HttpMethod.Get, uriBuider.BuildParametersUri()));
+
+            var newsResponse = await _restClient.SendAsync(settings, null).ToObservable();
             try
             {
                 var fillDetailsTask = newsResponse.News.Select(x => GetDetailsAsync(x.Id, x.DateTimeOffsetPublish));
-                var rsss = await Task.WhenAll(fillDetailsTask);
-
-                foreach (var item in newsResponse.News.Where(x => CategoryFinderCollection.FirstOrDefault(c => c.PageId == x.PageId.ToString()) == null))
-                {
-                    var rssItem = rsss.FirstOrDefault(x => x.id == item.Id.ToString());
-                    if (rssItem != null)
-                    {
-                        CategoryFinderCollection.Add(new CategoryFinder()
-                        {
-                            PageId = item.PageId.ToString(),
-                            CategoryName = rssItem.category
-                        });
-                    }
-                }
+                await Task.WhenAll(fillDetailsTask);
             }
-            catch (Exception ex)
+            catch (Exception)
             {
-
+                // ignore fill details task
             }
 
             return newsResponse.News;
@@ -101,11 +88,10 @@ namespace FootballClient.DataAccess.Providers
             var result = await _restClient.SendAsync<rss>(settings, tupleData =>
             {
                 if (!tupleData.Item2.HasValue)
-                    return true; 
+                    return true;
 
                 return requestIfExists && Math.Abs((publishedDate.UtcDateTime - tupleData.Item2.Value).TotalDays) < 1;
             });
-
 
             result.channel.item.id = id.ToString();
             return result?.channel?.item;

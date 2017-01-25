@@ -20,7 +20,7 @@ namespace FootballClient.DataAccess.Providers
             _restClient = restClient;
         }
 
-        public Task<CommentsResponse> LoadComments(int id, int pageIndex, CommentType commentType, RequestAccessMode mode = RequestAccessMode.Server)
+        public Task<CommentsResponse> LoadCommentsAsync(int id, int pageIndex, CommentType commentType, RequestAccessMode mode = RequestAccessMode.Server)
         {
             var request = new HttpRequestMessage();
 
@@ -35,8 +35,12 @@ namespace FootballClient.DataAccess.Providers
 
             request.RequestUri = uriBuilder.BuildParametersUri();
 
-            var parser = new JsonParser<CommentsResponse>();
-            return _restClient.SendMessageAsync(request, parser, mode);
+            var settings = new RestSettings<CommentsResponse>()
+                              .AddMode(mode)
+                              .AddParser(new JsonParser<CommentsResponse>())
+                              .AddRequestMessage(request);
+
+            return _restClient.SendAsync(settings, null);
         }
     }
 }

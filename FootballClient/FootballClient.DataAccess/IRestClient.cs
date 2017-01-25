@@ -42,7 +42,8 @@ namespace FootballClient.DataAccess
     public interface IRestClient
     {
         Task<T> SendAsync<T>(RestSettings<T> settigns, Func<Tuple<T, DateTimeOffset?>, bool> fetchPredicate);
-        Task<T> SendMessageAsync<T>(HttpRequestMessage request, IParserStrategy<T> parser, RequestAccessMode mode = RequestAccessMode.Server);
+
+        //Task<T> SendMessageAsync<T>(HttpRequestMessage request, IParserStrategy<T> parser, RequestAccessMode mode = RequestAccessMode.Server);
     }
 
     public class RestClient : IRestClient
