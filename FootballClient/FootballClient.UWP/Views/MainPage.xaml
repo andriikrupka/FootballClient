@@ -14,6 +14,10 @@
     mc:Ignorable="d">
 
     <prismMvvm:SessionStateAwarePage.Resources>
+        <BitmapImage x:Key="DefaultImage"
+                     UriSource="ms-appx:///Assets/default_image.jpg"/>
+
+
         <DataTemplate x:DataType="models:News"
                       x:Name="NewsTemplate">
             <Grid Height="92">
@@ -23,7 +27,7 @@
                         <ColumnDefinition />
                     </Grid.ColumnDefinitions>
 
-                    <Image Source="{x:Bind ImageUrl, TargetNullValue='/Assets/default_image.jpg'}"
+                    <Image Source="{Binding ImageUrl, TargetNullValue={StaticResource DefaultImage}, FallbackValue={StaticResource DefaultImage}}"
                            Stretch="UniformToFill"/>
                     <Grid Grid.Column="1"
                           Margin="12,0,0,0">
@@ -37,9 +41,9 @@
                                    FontFamily="{ThemeResource PhoneFontFamilySemiLight}"
                                    LineStackingStrategy="BlockLineHeight"
                                    LineHeight="26"
-                                   Text="{x:Bind Title}"/>
+                                   Text="{x:Bind Title, FallbackValue='empty'}"/>
 
-                        <TextBlock Text="{x:Bind DatePublish}"
+                        <TextBlock Text="{x:Bind DatePublish, FallbackValue='empty'}"
                                    Margin="0,0,0,12"
                                    VerticalAlignment="Bottom"
                                    Foreground="#A8A8A8"
@@ -100,7 +104,7 @@
             <Setter Property="SelectionMode" Value="None"/>
             <Setter Property="DesiredWidth" Value="400"/>
             <Setter Property="ItemContainerStyle" Value="{StaticResource FeedAdaptiveGridViewContainerStyle}"/>
-            <Setter Property="ItemTemplate" Value="{StaticResource FeedItemTemplate}"/>
+            <Setter Property="ItemTemplate" Value="{StaticResource NewsTemplate}"/>
         </Style>
 
         <Style TargetType="ComboBox" x:Key="CategoryComboBoxStyle">
@@ -236,7 +240,7 @@
                                                        Style="{StaticResource AdaptiveGridViewSetyle}"/>
                     </Grid>
                 </PivotItem>
-                <PivotItem Header="авторские"
+                <!--<PivotItem Header="авторские"
                            Margin="12,0,0,0">
                     <Grid>
                         <Grid.RowDefinitions>
@@ -253,7 +257,7 @@
                                                        ItemClickCommand="{Binding ViewDetailsCommand}"
                                                        Style="{StaticResource AdaptiveGridViewSetyle}"/>
                     </Grid>
-                </PivotItem>
+                </PivotItem>-->
             </Pivot>
         </Grid>
 

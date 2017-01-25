@@ -64,7 +64,7 @@ namespace FootballClient.DataAccess.Providers
 
             try
             {
-                var fillDetailsTask = newsResponse.News.Select(x => GetDetailsAsync(x.Id, x.DateTimeOffsetPublish, true));
+                var fillDetailsTask = newsResponse.News.Select(x => GetDetailsAsync(x.Id, x.DateTimeOffsetPublish));
                 var rsss = await Task.WhenAll(fillDetailsTask);
 
                 foreach (var item in newsResponse.News.Where(x => CategoryFinderCollection.FirstOrDefault(c => c.PageId == x.PageId.ToString()) == null))

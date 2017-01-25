@@ -50,6 +50,11 @@ namespace FootballClient.UWP.ViewModels
             });
             list.Add(new Category
             {
+                Name = "Украина. Лига 2",
+                Code = "21"
+            });
+            list.Add(new Category
+            {
                 Name = "Англия",
                 Code = "66"
             });
@@ -124,6 +129,11 @@ namespace FootballClient.UWP.ViewModels
             {
                 Name = "Лига чемпионов",
                 Code = "580"
+            });
+            list.Add(new Category
+            {
+                Name = "Лига чемпионов. Анонс",
+                Code = "589"
             });
 
             list.Add(new Category

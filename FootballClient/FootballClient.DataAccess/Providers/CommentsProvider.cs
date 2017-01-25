@@ -20,7 +20,7 @@ namespace FootballClient.DataAccess.Providers
             _restClient = restClient;
         }
 
-        public Task<CommentsResponse> LoadComments(uint id, int pageIndex, CommentType commentType, RequestAccessMode mode = RequestAccessMode.Server)
+        public Task<CommentsResponse> LoadComments(int id, int pageIndex, CommentType commentType, RequestAccessMode mode = RequestAccessMode.Server)
         {
             var request = new HttpRequestMessage();
 
