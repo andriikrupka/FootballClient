@@ -1,5 +1,6 @@
 ﻿{
   "dependencies": {
+    "akavache": "5.0.0",
     "Fody": "1.29.4",
     "Microsoft.NETCore.UniversalWindowsPlatform": "5.2.2",
     "Newtonsoft.Json": "9.0.1",

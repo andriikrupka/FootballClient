@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Prism.Windows.Navigation;
 using FootballClient.UWP.Views;
+using Prism.Commands;
 
 namespace FootballClient.UWP.ViewModels
 {
@@ -65,10 +66,21 @@ namespace FootballClient.UWP.ViewModels
                     PageToken = NavigationPages.Photos
                 }
             };
+
+            BackPressedCommand = new DelegateCommand(BackPressedExecute);
+        }
+
+        private void BackPressedExecute()
+        {
+            if (_navigationService.CanGoBack())
+            {
+                _navigationService.GoBack();
+            }
         }
 
         public List<MenuItem> NavigationItems { get; set; }
 
+        public DelegateCommand BackPressedCommand { get; set; }
         public MenuItem SelectedItem { get; set; }
         public event EventHandler<MenuItem> SelectedItemChanged;
         public void OnSelectedItemChanged()

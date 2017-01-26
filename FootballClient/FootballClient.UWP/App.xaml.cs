@@ -18,21 +18,22 @@ using Windows.UI.ViewManagement;
 using FootballClient.Models;
 using Windows.Foundation.Metadata;
 using Windows.UI;
+using Akavache;
 
 namespace FootballClient.UWP
 {
     sealed partial class App : PrismUnityApplication
     {
-        private IFrameFacade _rootFrameFacade;
+        private readonly CultureInfo _ruInfo = new CultureInfo("ru-RU");
 
         public App()
         {
             this.InitializeComponent();
+            BlobCache.ApplicationName = "FootballClient";
         }
 
         protected override INavigationService OnCreateNavigationService(IFrameFacade rootFrame)
         {
-            _rootFrameFacade = rootFrame;
             Container.RegisterInstance<IFrameFacade>(rootFrame);
             return base.OnCreateNavigationService(rootFrame);
         }
@@ -46,16 +47,22 @@ namespace FootballClient.UWP
 
         protected override Task OnInitializeAsync(IActivatedEventArgs args)
         {
+            CultureInfo.CurrentCulture = _ruInfo;
+            CultureInfo.CurrentUICulture = _ruInfo;
+
             Container.RegisterInstance<IEventAggregator>(new EventAggregator());
             Container.RegisterInstance<IRestClient>(new RestClient());
             Container.RegisterType<FeedNewsProvider>();
             Container.RegisterType<FictionProvider>();
             Container.RegisterType<AuthorsProvider>();
+            Container.RegisterType<CommentsProvider>();
+            Container.RegisterType<MatchesProvider>();
+
             Container.RegisterType<CommonViewModel>(new ContainerControlledLifetimeManager());
             Container.RegisterType<NewsListViewModel>();
             Container.RegisterType<FictionListViewModel>();
             Container.RegisterType<AuthorsListViewModel>();
-            
+
             ViewModelLocationProvider.SetDefaultViewTypeToViewModelTypeResolver(viewType =>
             {
                 var viewModelTypeName = string.Format(CultureInfo.InvariantCulture, "FootballClient.UWP.ViewModels.{0}ViewModel, FootballClient.UWP, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null", viewType.Name);

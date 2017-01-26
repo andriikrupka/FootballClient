@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Runtime.InteropServices.WindowsRuntime;
 using System.Threading.Tasks;
 using Windows.UI.Xaml.Data;
@@ -10,6 +9,7 @@ namespace FootballClient.Models
     public class IncrementalObservableCollection<T> : ObservableRangeCollection<T>, ISupportIncrementalLoading
     {
         private Func<Task<IList<T>>> _loandFunction;
+
         public IncrementalObservableCollection(Func<Task<IList<T>>> load)
             : base()
         {

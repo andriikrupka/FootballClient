@@ -336,7 +336,10 @@ namespace SamplesCommon
         {
             var control = d as CompositionImage;
             control?.LoadSurface();
+            control?.ImageSourceChanged?.Invoke(control, EventArgs.Empty);
         }
+
+        public event EventHandler ImageSourceChanged;
 
         public bool IsContentLoaded
         {

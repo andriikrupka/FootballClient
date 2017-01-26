@@ -1,6 +1,5 @@
 ﻿using FootballClient.DataAccess.Parsers;
 using FootballClient.Models;
-using System;
 using System.Net.Http;
 using System.Threading.Tasks;
 
@@ -11,10 +10,9 @@ namespace FootballClient.DataAccess.Providers
         News = 1,
         Mathces = 2
     }
+
     public class CommentsProvider
     {
-        private const string CommentsKeyPattern = "Comments_{0}_Page_{1}";
-
         private readonly IRestClient _restClient;
 
         public CommentsProvider(IRestClient restClient)
@@ -22,19 +20,27 @@ namespace FootballClient.DataAccess.Providers
             _restClient = restClient;
         }
 
-        public Task<CommentsResponse> LoadComments(uint id, int pageIndex, CommentType commentType)
+        public Task<CommentsResponse> LoadCommentsAsync(int id, int pageIndex, CommentType commentType)
         {
             var request = new HttpRequestMessage();
-            request.RequestUri = new Uri("http://services.football.ua/api/Comment/Comments");
-            request.Properties.Add("itemId", id.ToString());
-            request.Properties.Add("commentType", ((int)commentType).ToString());
-            request.Properties.Add("pageIndex", pageIndex.ToString());
-            request.Properties.Add("pageSize", "25");
-            request.Properties.Add("sort", "0");
-            request.Properties.Add("anchor", "");
-            request.Properties.Add("callback","");
-            var parser = new JsonParser<CommentsResponse>();
-            return _restClient.SendMessageAsync(request, parser);
+
+            var uriBuilder = new ParameterUriBuilder("http://services.football.ua/api/Comment/Comments");
+            uriBuilder.Add("itemId", id.ToString());
+            uriBuilder.Add("commentType", ((int)commentType).ToString());
+            uriBuilder.Add("pageIndex", pageIndex.ToString());
+            uriBuilder.Add("pageSize", "25");
+            uriBuilder.Add("sort", "0");
+            uriBuilder.Add("anchor", "");
+            uriBuilder.Add("callback","");
+
+            request.RequestUri = uriBuilder.BuildParametersUri();
+
+            var settings = new RestSettings<CommentsResponse>()
+                              .AddMode(RequestAccessMode.Server)
+                              .AddParser(new JsonParser<CommentsResponse>())
+                              .AddRequestMessage(request);
+
+            return _restClient.SendAsync(settings, null);
         }
     }
 }

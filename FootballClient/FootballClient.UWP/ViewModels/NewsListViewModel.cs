@@ -1,5 +1,6 @@
 ﻿using FootballClient.DataAccess.Providers;
 using FootballClient.Models;
+using Newtonsoft.Json;
 using Prism.Commands;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -33,113 +34,124 @@ namespace FootballClient.UWP.ViewModels
             #region Custom
             list.Add(new Category
             {
-                Name = "Все новости"
+                Name = "Все новости",
+                Code = "1"
             });
-            list.Add(new Category
-            {
-                Name = "ЕВРО-2016",
-                Code = "football_euro2016_newsi"
-            });
+            
             list.Add(new Category
             {
                 Name = "Украина",
-                Code = "football_ukraine_newsi"
+                Code = "4"
             });
-
+            list.Add(new Category
+            {
+                Name = "Украина. Лига 1",
+                Code = "12"
+            });
+            list.Add(new Category
+            {
+                Name = "Украина. Лига 2",
+                Code = "21"
+            });
             list.Add(new Category
             {
                 Name = "Англия",
-                Code = "football_england_newsi"
+                Code = "66"
             });
 
             list.Add(new Category
             {
                 Name = "Аргентина",
-                Code = "football_argentina_newsi"
+                Code = "96"
             });
 
             list.Add(new Category
             {
                 Name = "Бразилия",
-                Code = "football_brazil_newsi"
+                Code = "70"
             });
 
             list.Add(new Category
             {
                 Name = "Германия",
-                Code = "football_germany_newsi"
+                Code = "74"
             });
 
             list.Add(new Category
             {
                 Name = "Италия",
-                Code = "football_italy_newsi"
+                Code = "113"
             });
 
             list.Add(new Category
             {
                 Name = "Испания",
-                Code = "football_spain_newsi"
+                Code = "121"
             });
 
             list.Add(new Category
             {
                 Name = "Нидерланды",
-                Code = "football_netherlands_newsi"
+                Code = "129"
             });
 
             list.Add(new Category
             {
                 Name = "Португалия",
-                Code = "football_portugal_newsi"
+                Code = "168"
             });
 
             list.Add(new Category
             {
                 Name = "Северная Америка",
-                Code = "football_northamerica_newsi"
+                Code = "184"
             });
 
             list.Add(new Category
             {
                 Name = "Турция",
-                Code = "football_turkey_newsi"
+                Code = "197"
             });
 
             list.Add(new Category
             {
                 Name = "Франция",
-                Code = "football_france_newsi"
+                Code = "189"
             });
 
             list.Add(new Category
             {
                 Name = "Другие страны",
-                Code = "football_countrieselse_newsi"
+                Code = "181"
             });
 
             list.Add(new Category
             {
                 Name = "Лига чемпионов",
-                Code = "football_champ_newsi"
+                Code = "580"
+            });
+            list.Add(new Category
+            {
+                Name = "Лига чемпионов. Анонс",
+                Code = "589"
             });
 
             list.Add(new Category
             {
                 Name = "Лига Европы",
-                Code = "football_europaleague_newsi"
+                Code = "105"
             });
 
             list.Add(new Category
             {
                 Name = "Копа Либертадорес",
-                Code = "football_copalibertadores_newsi"
+                Code = "156"
             });
 
             list.Add(new Category
             {
-                Name = "ЧМ-2014",
-                Code = "football_worldcup2014_newsi"
+                Name = "ЧМ-2018",
+                Code = "569"
             });
             #endregion
 

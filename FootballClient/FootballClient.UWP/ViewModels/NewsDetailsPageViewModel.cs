@@ -6,24 +6,55 @@ using System.Threading.Tasks;
 using Prism.Windows.Navigation;
 using FootballClient.Models;
 using Prism.Windows.AppModel;
+using Prism.Commands;
+using Windows.System;
+using FootballClient.DataAccess.Providers;
+using FootballClient.Models.News;
 
 namespace FootballClient.UWP.ViewModels
 {
     public class NewsDetailsPageViewModel : BaseViewModel
     {
         private readonly ISessionStateService _sessionStateService;
-        public NewsDetailsPageViewModel(ISessionStateService sessionStateService)
+        private INavigationService _navigationService;
+        private readonly FeedNewsProvider _feedNewsProvider;
+
+        public NewsDetailsPageViewModel(ISessionStateService sessionStateService,
+                                        INavigationService navigationService,
+                                        FeedNewsProvider feedNewsProvider)
         {
+            _navigationService = navigationService;
             _sessionStateService = sessionStateService;
+            _feedNewsProvider = feedNewsProvider;
+            ViewInWebCommand = new DelegateCommand(ViewInWebExecute);
+            ViewCommentsCommand = new DelegateCommand(ViewCommentsExecute);
         }
 
+        public DelegateCommand ViewInWebCommand { get; private set; }
+
+        public DelegateCommand ViewCommentsCommand { get; private set; }
+
         [RestorableState]
-        public FeedItem CurrentNews { get; private set; }
-        public override void OnNavigatedTo(NavigatedToEventArgs e, Dictionary<string, object> viewModelState)
+        public NewsItem CurrentNews { get; private set; }
+        public Models.News.RssNewsDetailsChannelItem NewsDetails { get; private set; }
+
+        public override async void OnNavigatedTo(NavigatedToEventArgs e, Dictionary<string, object> viewModelState)
         {
             base.OnNavigatedTo(e, viewModelState);
 
-            CurrentNews = _sessionStateService.SessionState["CurrentNews"] as FeedItem;
+            var news = _sessionStateService.SessionState["CurrentNews"] as NewsItem;
+            NewsDetails = await _feedNewsProvider.GetDetailsAsync(news.Id, news.DateTimeOffsetPublish, true);
+        }
+
+        private void ViewInWebExecute()
+        {
+            var uri = new Uri(CurrentNews.Link);
+            var ingore = Launcher.LaunchUriAsync(uri);
+        }
+
+        private void ViewCommentsExecute()
+        {
+            _navigationService.Navigate(NavigationPages.Comments, null);
         }
     }
 }

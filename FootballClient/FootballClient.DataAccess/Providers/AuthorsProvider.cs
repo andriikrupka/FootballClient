@@ -9,9 +9,6 @@ namespace FootballClient.DataAccess.Providers
 {
     public class AuthorsProvider
     {
-        private const string AuthorsPattern = "AuthorsNews_{0}_{1}";
-        private const string AuthorsCategories = "AuthorsCategories";
-
         private readonly IRestClient _restClient;
 
         public AuthorsProvider(IRestClient restClient)
@@ -19,14 +16,15 @@ namespace FootballClient.DataAccess.Providers
             _restClient = restClient;
         }
 
-        //http://football.ua/handlers/stanfy/authors.ashx
-        public Task<ResponseCategory> LoadAuthorsCategoriesAsync()
-        {
-            var request = new HttpRequestMessage();
-            var parser = new XmlParser<ResponseCategory>();
-            request.RequestUri = new Uri("http://football.ua/handlers/stanfy/authors.ashx");
-            return _restClient.SendMessageAsync(request, parser);
-        }
+        ////http://football.ua/handlers/stanfy/authors.ashx
+        //public Task<ResponseCategory> LoadAuthorsCategoriesAsync()
+        //{
+        //    var request = new HttpRequestMessage();
+        //    var parser = new XmlParser<ResponseCategory>();
+        //    request.RequestUri = new Uri("http://football.ua/handlers/stanfy/authors.ashx");
+        //    var settings = new RestSettings<>
+        //    return _restClient.SendMessageAsync(request, parser);
+        //}
 
         public Task<List<FeedItem>> LoadAuthorsFeedAsync(FeedItem lastFeedItem = null, string filterCode = "")
         {
@@ -48,7 +46,12 @@ namespace FootballClient.DataAccess.Providers
 
             request.RequestUri = requestUriBuilder.BuildParametersUri();
 
-            return _restClient.SendMessageAsync(request, parser);
+            var restSettings = new RestSettings<List<FeedItem>>()
+                                   .AddMode(RequestAccessMode.Server)
+                                   .AddParser(parser)
+                                   .AddRequestMessage(request);
+
+            return _restClient.SendAsync(restSettings, null);
         }
     }
 }

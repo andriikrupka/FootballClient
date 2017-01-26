@@ -1,54 +1,71 @@
-﻿//using System.Threading;
+﻿using System.Threading;
+using FootballClient.DataAccess.Request.Parsers;
+using FootballClient.Models;
+using System;
+using System.Threading.Tasks;
+using FootballClient.DataAccess.Parsers;
+using System.Net.Http;
 
-//namespace FootballClient.DataAccess.Providers
-//{
-//    using FootballClient.DataAccess.Request;
-//    using FootballClient.DataAccess.Request.Parsers;
-//    using FootballClient.Models;
-//    using System;
-//    using System.Threading.Tasks;
+namespace FootballClient.DataAccess.Providers
+{
+    public class MatchesProvider
+    {
+        private readonly IRestClient _restClient;
 
-//    public class MatchesProvider
-//    {
-//        public async Task<Response<MatchesResponse>> LoadMatchesAsync(DateTime date, RequestAccessMode mode)
-//        {
-//            return await this.LoadMatchesAsync(date, mode, CancellationToken.None);
-//        }
-//        public async Task<Response<MatchesResponse>> LoadMatchesAsync(DateTime date, RequestAccessMode mode, CancellationToken cancellationToken)
-//        {
-//            var request = new Request<MatchesResponse>();
-//            var month = date.Month;
-//            var year = date.Year;
-//            var day = date.Day - 1;
-//            if (day == 0)
-//            {
-//                month -= 1;
-//                if (month == 0)
-//                {
-//                    year -= 1;
-//                    month = 12;
-//                }
+        public MatchesProvider(IRestClient restClient)
+        {
+            _restClient = restClient;
+        }
 
-//                day = DateTime.DaysInMonth(date.Year, month);
-//            }
-//            var dtKey = string.Format("{0}-{1}-{2}T00:00:00", year, month, day);
-//            request.Parameters.Add("dt", dtKey);
-//            request.Parameters.Add("direction", "false");
-//            request.Parameters.Add("callback", "");
-//            request.Parameters.Add("_1413706301734", "");
-//            request.ResponseParser = new JsonParser<MatchesResponse>();
-//            request.RequestAddress = "http://services.football.ua/api/FootballGameBlockMain/GameList";
-//            return await request.SendAsync(cancellationToken, mode, dtKey);
-//        }
+        public Task<MatchesResponse> LoadMatchesAsync(DateTime date)
+        {
+            return LoadMatchesAsync(date, CancellationToken.None);
+        }
 
-//        public async Task<Response<MatchDetails>> LoadMatchDetailsAsync( RequestAccessMode mode, string detailsLink, int gameId)
-//        {
-//            var request = new Request<MatchDetails>();
-//            request.RequestAddress = detailsLink;
-//            request.ResponseParser = new MatchDetailsParser();
-//            //request.ResponseParser = new MatchDetailsAngleParser();
-//            System.Diagnostics.Debug.WriteLine("LoadMatchDetailsAsync:");
-//            return  await request.SendAsync(mode, string.Format("Mathc_{0}", gameId));
-//        }
-//    }
-//}
+        public async Task<MatchesResponse> LoadMatchesAsync(DateTime date, CancellationToken cancellationToken)
+        {
+            var month = date.Month;
+            var year = date.Year;
+            var day = date.Day - 1;
+            if (day == 0)
+            {
+                month -= 1;
+                if (month == 0)
+                {
+                    year -= 1;
+                    month = 12;
+                }
+
+                day = DateTime.DaysInMonth(date.Year, month);
+            }
+
+            var dtKey = string.Format("{0}-{1}-{2}T00:00:00", year, month, day);
+            var uri = new ParameterUriBuilder("http://services.football.ua/api/FootballGameBlockMain/GameList");
+            uri.Add("dt", dtKey);
+            uri.Add("direction", "false");
+            uri.Add("callback", "");
+            uri.Add("_1413706301734", "");
+
+            var requestMessage = new HttpRequestMessage(HttpMethod.Get, uri.BuildParametersUri());
+            var settings = new RestSettings<MatchesResponse>()
+                               .AddMode(RequestAccessMode.Server)
+                               .AddParser(new JsonParser<MatchesResponse>())
+                               .AddRequestMessage(requestMessage);
+
+            return await _restClient.SendAsync<MatchesResponse>(settings, null);
+        }
+
+        public async Task<MatchDetails> LoadMatchDetailsAsync(string detailsLink, int gameId)
+        {
+            var request = new HttpRequestMessage();
+            request.RequestUri = new Uri(detailsLink);
+
+            var settings = new RestSettings<MatchDetails>()
+                               .AddMode(RequestAccessMode.Server)
+                               .AddParser(new MatchDetailsParser())
+                               .AddRequestMessage(request);
+
+            return await _restClient.SendAsync(settings, null);
+        }
+    }
+}

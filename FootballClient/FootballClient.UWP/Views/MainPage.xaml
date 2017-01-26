@@ -14,6 +14,44 @@
     mc:Ignorable="d">
 
     <prismMvvm:SessionStateAwarePage.Resources>
+        <BitmapImage x:Key="DefaultImage"
+                     UriSource="ms-appx:///Assets/default_image.jpg"/>
+
+
+        <DataTemplate x:DataType="models:NewsItem"
+                      x:Name="NewsTemplate">
+            <Grid Height="92">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="117"/>
+                        <ColumnDefinition />
+                    </Grid.ColumnDefinitions>
+
+                    <Image Source="{Binding ImageUrl, TargetNullValue={StaticResource DefaultImage}, FallbackValue={StaticResource DefaultImage}}"
+                           Stretch="UniformToFill"/>
+                    <Grid Grid.Column="1"
+                          Margin="12,0,0,0">
+
+                        <TextBlock MaxLines="2"
+                                   Margin="0,-2,0,0"
+                                   TextWrapping="Wrap"
+                                   TextTrimming="CharacterEllipsis"
+                                   Foreground="#212121"
+                                   FontSize="22"
+                                   FontFamily="{ThemeResource PhoneFontFamilySemiLight}"
+                                   LineStackingStrategy="BlockLineHeight"
+                                   LineHeight="26"
+                                   Text="{x:Bind Title, FallbackValue='empty'}"/>
+
+                        <TextBlock Text="{x:Bind FormattedDatePublish, FallbackValue='empty'}"
+                                   Margin="0,0,0,12"
+                                   VerticalAlignment="Bottom"
+                                   Foreground="#A8A8A8"
+                                   FontSize="17"/>
+                    </Grid>
+                </Grid>
+            </Grid>
+        </DataTemplate>
         <DataTemplate x:DataType="models:FeedItem"
                       x:Name="FeedItemTemplate">
             <Grid Height="92">
@@ -66,7 +104,7 @@
             <Setter Property="SelectionMode" Value="None"/>
             <Setter Property="DesiredWidth" Value="400"/>
             <Setter Property="ItemContainerStyle" Value="{StaticResource FeedAdaptiveGridViewContainerStyle}"/>
-            <Setter Property="ItemTemplate" Value="{StaticResource FeedItemTemplate}"/>
+            <Setter Property="ItemTemplate" Value="{StaticResource NewsTemplate}"/>
         </Style>
 
         <Style TargetType="ComboBox" x:Key="CategoryComboBoxStyle">
@@ -173,6 +211,7 @@
                         <uwpUIToolkit:AdaptiveGridView ItemsSource="{Binding NewsListViewModel.SelectedViewModel.FeedItems}"
                                                        Grid.Row="1"
                                                        Style="{StaticResource AdaptiveGridViewSetyle}"
+                                                       ItemTemplate="{StaticResource NewsTemplate}"
                                                        ItemClickCommand="{Binding ViewDetailsCommand}"/>
 
 
@@ -201,7 +240,7 @@
                                                        Style="{StaticResource AdaptiveGridViewSetyle}"/>
                     </Grid>
                 </PivotItem>
-                <PivotItem Header="авторские"
+                <!--<PivotItem Header="авторские"
                            Margin="12,0,0,0">
                     <Grid>
                         <Grid.RowDefinitions>
@@ -218,7 +257,7 @@
                                                        ItemClickCommand="{Binding ViewDetailsCommand}"
                                                        Style="{StaticResource AdaptiveGridViewSetyle}"/>
                     </Grid>
-                </PivotItem>
+                </PivotItem>-->
             </Pivot>
         </Grid>
 

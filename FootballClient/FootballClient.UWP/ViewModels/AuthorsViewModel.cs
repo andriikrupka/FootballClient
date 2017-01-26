@@ -5,6 +5,7 @@ using System.Collections.ObjectModel;
 using System.Linq;
 using System.Threading.Tasks;
 using System;
+using FootballClient.DataAccess;
 
 namespace FootballClient.UWP.ViewModels
 {
@@ -31,7 +32,7 @@ namespace FootballClient.UWP.ViewModels
 
         private async Task<IList<FeedItem>> LoadMoreItemsAsync()
         {
-            base.BusyCount++;
+            BusyCount++;
             var items = new List<FeedItem>();
             IsError = false;
 
@@ -40,10 +41,16 @@ namespace FootballClient.UWP.ViewModels
                 var response = await _authorsProvider.LoadAuthorsFeedAsync(FeedItems.LastOrDefault(), this.Category.Code);
                 items.AddRange(response);
             }
-            catch (System.Exception)
+            catch (Exception)
             {
 
-                IsError = true;
+                //IsError = true;
+
+                var response = await _authorsProvider.LoadAuthorsFeedAsync(FeedItems.LastOrDefault(), this.Category.Code);
+                if (response != null)
+                {
+                    items.AddRange(response);
+                }
             }
 
             //foreach (var item in items)
