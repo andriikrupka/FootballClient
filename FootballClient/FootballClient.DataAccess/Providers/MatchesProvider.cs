@@ -17,11 +17,12 @@ namespace FootballClient.DataAccess.Providers
             _restClient = restClient;
         }
 
-        public Task<MatchesResponse> LoadMatchesAsync(DateTime date, RequestAccessMode mode)
+        public Task<MatchesResponse> LoadMatchesAsync(DateTime date)
         {
-            return LoadMatchesAsync(date, mode, CancellationToken.None);
+            return LoadMatchesAsync(date, CancellationToken.None);
         }
-        public async Task<MatchesResponse> LoadMatchesAsync(DateTime date, RequestAccessMode mode, CancellationToken cancellationToken)
+
+        public async Task<MatchesResponse> LoadMatchesAsync(DateTime date, CancellationToken cancellationToken)
         {
             var month = date.Month;
             var year = date.Year;
@@ -46,14 +47,25 @@ namespace FootballClient.DataAccess.Providers
             uri.Add("_1413706301734", "");
 
             var requestMessage = new HttpRequestMessage(HttpMethod.Get, uri.BuildParametersUri());
-            return await _restClient.SendMessageAsync<MatchesResponse>(requestMessage, new JsonParser<MatchesResponse>(), mode);
+            var settings = new RestSettings<MatchesResponse>()
+                               .AddMode(RequestAccessMode.Server)
+                               .AddParser(new JsonParser<MatchesResponse>())
+                               .AddRequestMessage(requestMessage);
+
+            return await _restClient.SendAsync<MatchesResponse>(settings, null);
         }
 
-        public async Task<MatchDetails> LoadMatchDetailsAsync(RequestAccessMode mode, string detailsLink, int gameId)
+        public async Task<MatchDetails> LoadMatchDetailsAsync(string detailsLink, int gameId)
         {
             var request = new HttpRequestMessage();
             request.RequestUri = new Uri(detailsLink);
-            return await _restClient.SendMessageAsync(request, new MatchDetailsParser(), mode);
+
+            var settings = new RestSettings<MatchDetails>()
+                               .AddMode(RequestAccessMode.Server)
+                               .AddParser(new MatchDetailsParser())
+                               .AddRequestMessage(request);
+
+            return await _restClient.SendAsync(settings, null);
         }
     }
 }

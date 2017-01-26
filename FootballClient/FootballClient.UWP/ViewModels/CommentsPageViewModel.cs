@@ -62,7 +62,7 @@ namespace FootballClient.UWP.ViewModels
         public DelegateCommand RefreshCommand { get; private set; }
 
         [RestorableState]
-        public FeedItem CurrentNews { get; private set; }
+        public NewsItem CurrentNews { get; private set; }
 
         public bool IsResultEmpty { get; set; }
 
@@ -75,11 +75,11 @@ namespace FootballClient.UWP.ViewModels
         public override void OnNavigatedTo(NavigatedToEventArgs e, Dictionary<string, object> viewModelState)
         {
             base.OnNavigatedTo(e, viewModelState);
-            CurrentNews = _sessionStateService.SessionState["CurrentNews"] as FeedItem;
+            CurrentNews = _sessionStateService.SessionState["CurrentNews"] as NewsItem;
             LoadData(CurrentNews.Id, CurrentIndex, false);
         }
 
-        private async void LoadData(uint postId, int pageIndex, bool isNeeedClear = true)
+        private async void LoadData(int postId, int pageIndex, bool isNeeedClear = true)
         {
             BusyCount++;
             _isLoadingNow = true;
@@ -88,7 +88,7 @@ namespace FootballClient.UWP.ViewModels
             LoadPreviousPageCommand.RaiseCanExecuteChanged();
             RefreshCommand.RaiseCanExecuteChanged();
 
-            var commentsResponse = await _commentsProvider.LoadComments(postId, pageIndex, commentType);
+            var commentsResponse = await _commentsProvider.LoadCommentsAsync(postId, pageIndex, commentType);
             if (commentsResponse != null)
             {
                 CurrentIndex = commentsResponse.PagerCurrent;

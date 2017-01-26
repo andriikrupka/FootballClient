@@ -136,6 +136,7 @@
     <Compile Include="ViewModels\FictionListViewModel.cs" />
     <Compile Include="ViewModels\FictionViewModel.cs" />
     <Compile Include="ViewModels\MainPageViewModel.cs" />
+    <Compile Include="ViewModels\MatchDetailsPageViewModel.cs" />
     <Compile Include="ViewModels\MatchesPageViewModel.cs" />
     <Compile Include="ViewModels\Messages\BusyCountMessage.cs" />
     <Compile Include="ViewModels\NewsDetailsPageViewModel.cs" />
@@ -148,6 +149,9 @@
       <DependentUpon>MainPage.xaml</DependentUpon>
     </Compile>
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Views\MatchDetailsPage.xaml.cs">
+      <DependentUpon>MatchDetailsPage.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Views\MatchesPage.xaml.cs">
       <DependentUpon>MatchesPage.xaml</DependentUpon>
     </Compile>
@@ -204,6 +208,10 @@
     <Page Include="Views\MainPage.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Views\MatchDetailsPage.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Views\MatchesPage.xaml">
       <SubType>Designer</SubType>

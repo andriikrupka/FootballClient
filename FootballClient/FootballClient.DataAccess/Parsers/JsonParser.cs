@@ -6,8 +6,16 @@ namespace FootballClient.DataAccess.Parsers
     {
         public T Parse(string data)
         {
-            var response = JsonConvert.DeserializeObject<T>(data);
-            return response;
+            try
+            {
+                var response = JsonConvert.DeserializeObject<T>(data);
+                return response;
+            }
+            catch (System.Exception ex)
+            {
+
+                throw;
+            }
         }
     }
 }
