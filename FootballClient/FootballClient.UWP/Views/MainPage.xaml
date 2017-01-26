@@ -18,7 +18,7 @@
                      UriSource="ms-appx:///Assets/default_image.jpg"/>
 
 
-        <DataTemplate x:DataType="models:News"
+        <DataTemplate x:DataType="models:NewsItem"
                       x:Name="NewsTemplate">
             <Grid Height="92">
                 <Grid>
@@ -43,7 +43,7 @@
                                    LineHeight="26"
                                    Text="{x:Bind Title, FallbackValue='empty'}"/>
 
-                        <TextBlock Text="{x:Bind DatePublish, FallbackValue='empty'}"
+                        <TextBlock Text="{x:Bind FormattedDatePublish, FallbackValue='empty'}"
                                    Margin="0,0,0,12"
                                    VerticalAlignment="Bottom"
                                    Foreground="#A8A8A8"

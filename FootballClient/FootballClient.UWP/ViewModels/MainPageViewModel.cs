@@ -1,12 +1,8 @@
-﻿using Prism.Windows.Mvvm;
-using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using Prism.Windows.Navigation;
 using FootballClient.Models;
 using Prism.Commands;
 using Prism.Windows.AppModel;
-using Newtonsoft.Json;
-using FootballClient.DataAccess.Providers;
 
 namespace FootballClient.UWP.ViewModels
 {
@@ -34,7 +30,7 @@ namespace FootballClient.UWP.ViewModels
             _authorsListViewModel = authorsListViewModel;
             _newsListViewModel = newsListViewModel;
             _commonViewModel = commonViewModel;
-            ViewDetailsCommand = new DelegateCommand<News>(ViewDetailsExecute);
+            ViewDetailsCommand = new DelegateCommand<NewsItem>(ViewDetailsExecute);
             RefreshTabCommand = new DelegateCommand(RefreshExecute);
         }
 
@@ -57,7 +53,7 @@ namespace FootballClient.UWP.ViewModels
 
         public int SelectedTabIndex { get; set; }
 
-        public DelegateCommand<News> ViewDetailsCommand { get; }
+        public DelegateCommand<NewsItem> ViewDetailsCommand { get; }
 
         public DelegateCommand RefreshTabCommand { get; }
         public NewsListViewModel NewsListViewModel
@@ -92,7 +88,7 @@ namespace FootballClient.UWP.ViewModels
             }
         }
 
-        private void ViewDetailsExecute(News item)
+        private void ViewDetailsExecute(NewsItem item)
         {
             _sessionStateService.SessionState["CurrentNews"] = item;
             _navigationService.Navigate(NavigationPages.NewsDetails, null);

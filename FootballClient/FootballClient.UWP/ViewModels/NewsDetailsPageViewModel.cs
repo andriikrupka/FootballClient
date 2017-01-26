@@ -9,6 +9,7 @@ using Prism.Windows.AppModel;
 using Prism.Commands;
 using Windows.System;
 using FootballClient.DataAccess.Providers;
+using FootballClient.Models.News;
 
 namespace FootballClient.UWP.ViewModels
 {
@@ -34,14 +35,14 @@ namespace FootballClient.UWP.ViewModels
         public DelegateCommand ViewCommentsCommand { get; private set; }
 
         [RestorableState]
-        public News CurrentNews { get; private set; }
-        public rssChannelItem NewsDetails { get; private set; }
+        public NewsItem CurrentNews { get; private set; }
+        public Models.News.RssNewsDetailsChannelItem NewsDetails { get; private set; }
 
         public override async void OnNavigatedTo(NavigatedToEventArgs e, Dictionary<string, object> viewModelState)
         {
             base.OnNavigatedTo(e, viewModelState);
 
-            var news = _sessionStateService.SessionState["CurrentNews"] as News;
+            var news = _sessionStateService.SessionState["CurrentNews"] as NewsItem;
             NewsDetails = await _feedNewsProvider.GetDetailsAsync(news.Id, news.DateTimeOffsetPublish, true);
         }
 

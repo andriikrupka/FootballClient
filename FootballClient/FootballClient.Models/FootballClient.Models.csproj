@@ -48,6 +48,7 @@
     <Compile Include="Core\BindableObject.cs" />
     <Compile Include="News\News.cs" />
     <Compile Include="News\NewsResponse.cs" />
+    <Compile Include="News\RssNewsDetails\RssNewsDetails.cs" />
     <Compile Include="ObservableRangeCollection.cs" />
     <Compile Include="ExpirationRate.cs" />
     <Compile Include="Interfaces\IDataBaseProvider.cs" />
@@ -57,7 +58,7 @@
     <Compile Include="Mathces\MatchesResponse.cs" />
     <Compile Include="Mathces\MatchFeed.cs" />
     <Compile Include="Mathces\TextFeed.cs" />
-    <Compile Include="News.cs" />
+    <Compile Include="FeedItem.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="RssFeed\Link.cs" />
     <Compile Include="RssFeed\Rss.cs" />

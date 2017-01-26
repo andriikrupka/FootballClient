@@ -17,11 +17,12 @@ namespace FootballClient.DataAccess.Providers
             _restClient = restClient;
         }
 
-        public Task<MatchesResponse> LoadMatchesAsync(DateTime date, RequestAccessMode mode)
+        public Task<MatchesResponse> LoadMatchesAsync(DateTime date)
         {
-            return LoadMatchesAsync(date, mode, CancellationToken.None);
+            return LoadMatchesAsync(date, CancellationToken.None);
         }
-        public async Task<MatchesResponse> LoadMatchesAsync(DateTime date, RequestAccessMode mode, CancellationToken cancellationToken)
+
+        public async Task<MatchesResponse> LoadMatchesAsync(DateTime date, CancellationToken cancellationToken)
         {
             var month = date.Month;
             var year = date.Year;
@@ -47,20 +48,20 @@ namespace FootballClient.DataAccess.Providers
 
             var requestMessage = new HttpRequestMessage(HttpMethod.Get, uri.BuildParametersUri());
             var settings = new RestSettings<MatchesResponse>()
-                               .AddMode(mode)
+                               .AddMode(RequestAccessMode.Server)
                                .AddParser(new JsonParser<MatchesResponse>())
                                .AddRequestMessage(requestMessage);
 
             return await _restClient.SendAsync<MatchesResponse>(settings, null);
         }
 
-        public async Task<MatchDetails> LoadMatchDetailsAsync(RequestAccessMode mode, string detailsLink, int gameId)
+        public async Task<MatchDetails> LoadMatchDetailsAsync(string detailsLink, int gameId)
         {
             var request = new HttpRequestMessage();
             request.RequestUri = new Uri(detailsLink);
 
             var settings = new RestSettings<MatchDetails>()
-                               .AddMode(mode)
+                               .AddMode(RequestAccessMode.Server)
                                .AddParser(new MatchDetailsParser())
                                .AddRequestMessage(request);
 

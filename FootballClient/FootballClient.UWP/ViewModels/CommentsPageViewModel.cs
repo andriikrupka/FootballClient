@@ -62,7 +62,7 @@ namespace FootballClient.UWP.ViewModels
         public DelegateCommand RefreshCommand { get; private set; }
 
         [RestorableState]
-        public News CurrentNews { get; private set; }
+        public NewsItem CurrentNews { get; private set; }
 
         public bool IsResultEmpty { get; set; }
 
@@ -75,7 +75,7 @@ namespace FootballClient.UWP.ViewModels
         public override void OnNavigatedTo(NavigatedToEventArgs e, Dictionary<string, object> viewModelState)
         {
             base.OnNavigatedTo(e, viewModelState);
-            CurrentNews = _sessionStateService.SessionState["CurrentNews"] as News;
+            CurrentNews = _sessionStateService.SessionState["CurrentNews"] as NewsItem;
             LoadData(CurrentNews.Id, CurrentIndex, false);
         }
 

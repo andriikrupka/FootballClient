@@ -72,7 +72,7 @@ namespace FootballClient.UWP.ViewModels
 
         public object ErorrText { get; private set; }
 
-        private async Task LoadData(bool isRefresh = false, RequestAccessMode mode = RequestAccessMode.Server)
+        private async Task LoadData(bool isRefresh = false)
         {
             BusyCount++;
             IsErrorOcurred = false;
@@ -90,7 +90,7 @@ namespace FootballClient.UWP.ViewModels
                     try
                     {
                         var currentDateTime = MatchDateTime;
-                        var matchesResponse = await _matchesProvider.LoadMatchesAsync(currentDateTime.DateTime, mode, _cancellationToken.Token);
+                        var matchesResponse = await _matchesProvider.LoadMatchesAsync(currentDateTime.DateTime, _cancellationToken.Token);
                         var realResponseDate = DateTimeOffset.Parse(matchesResponse.ViewDate);
                         //TODO:
                         Championats = null;

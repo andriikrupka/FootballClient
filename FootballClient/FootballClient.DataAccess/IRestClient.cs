@@ -7,7 +7,7 @@ using System.Reactive.Threading.Tasks;
 
 namespace FootballClient.DataAccess
 {
-    public enum RequestAccessMode
+    internal enum RequestAccessMode
     {
         Server,
 
@@ -16,23 +16,23 @@ namespace FootballClient.DataAccess
 
     public class RestSettings<T>
     {
-        public HttpRequestMessage RequestMessage { get; private set; }
-        public RequestAccessMode Mode { get; private set; }
-        public IParserStrategy<T> Parser { get; private set; }
+        internal HttpRequestMessage RequestMessage { get; private set; }
+        internal RequestAccessMode Mode { get; private set; }
+        internal IParserStrategy<T> Parser { get; private set; }
 
-        public RestSettings<T> AddMode(RequestAccessMode mode)
+        internal RestSettings<T> AddMode(RequestAccessMode mode)
         {
             Mode = mode;
             return this;
         }
 
-        public RestSettings<T> AddRequestMessage(HttpRequestMessage requestMessage)
+        internal RestSettings<T> AddRequestMessage(HttpRequestMessage requestMessage)
         {
             RequestMessage = requestMessage;
             return this;
         }
 
-        public RestSettings<T> AddParser(IParserStrategy<T> parser)
+        internal RestSettings<T> AddParser(IParserStrategy<T> parser)
         {
             Parser = parser;
             return this;
@@ -41,7 +41,10 @@ namespace FootballClient.DataAccess
 
     public interface IRestClient
     {
-        Task<T> SendAsync<T>(RestSettings<T> settigns, Func<Tuple<T, DateTimeOffset?>, bool> fetchPredicate);
+        Task<T> SendAsync<T>(RestSettings<T> settigns,
+                             Func<Tuple<T, DateTimeOffset?>, bool> fetchPredicate = null,
+                             Action<T> beforeLoading = null,
+                             Action<Exception> onError = null);
 
         //Task<T> SendMessageAsync<T>(HttpRequestMessage request, IParserStrategy<T> parser, RequestAccessMode mode = RequestAccessMode.Server);
     }
@@ -60,31 +63,45 @@ namespace FootballClient.DataAccess
             _httpClient = new HttpClient(_httpClientHandler);
         }
 
-        public Task<T> SendMessageAsync<T>(HttpRequestMessage request, IParserStrategy<T> parser, RequestAccessMode mode = RequestAccessMode.Server)
-        {
-            return SendAsync<T>(new RestSettings<T>().AddParser(parser).AddRequestMessage(request).AddMode(mode), null);
-        }
-
-        public async Task<T> SendAsync<T>(RestSettings<T> settigns, Func<Tuple<T, DateTimeOffset?>, bool> fetchPredicate)
+        public async Task<T> SendAsync<T>(RestSettings<T> settigns,
+                                          Func<Tuple<T, DateTimeOffset?>, bool> fetchPredicate = null,
+                                          Action<T> beforeLoading = null,
+                                          Action<Exception> onError = null)
         {
             var key = Utility.Md5Calculator.ComputeMd5(settigns.RequestMessage.RequestUri.OriginalString);
-
+            bool? reload = null;
+            var cachedValue = default(T);
             var createdItem = await BlobCache.LocalMachine.GetObjectCreatedAt<T>(key);
+
             if (createdItem == null)
             {
-
+                reload = fetchPredicate?.Invoke(Tuple.Create(default(T), createdItem)) ?? true;
+            }
+            else
+            {
+                cachedValue = await BlobCache.LocalMachine.GetObject<T>(key);
             }
 
-            var value = await BlobCache.LocalMachine.GetOrCreateObject<T>(key, () => default(T), DateTimeOffset.Now.AddDays(10));
+            var value = cachedValue;
             if (settigns.Mode == RequestAccessMode.Cache)
             {
                 return value;
             }
 
-            var reload = fetchPredicate?.Invoke(Tuple.Create(value, createdItem)) ?? true;
-            if (reload)
+            reload = reload ?? fetchPredicate?.Invoke(Tuple.Create(value, createdItem)) ?? true;
+            if (reload.Value)
             {
-                value = await FetchData(settigns);
+                try
+                {
+                    beforeLoading?.Invoke(cachedValue);
+                    value = await FetchData(settigns);
+                }
+                catch (Exception ex)
+                {
+                    value = cachedValue;
+                    onError?.Invoke(ex);
+                }
+
                 await BlobCache.LocalMachine.InsertObject(key, value, DateTimeOffset.Now.AddDays(10));
             }
 

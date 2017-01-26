@@ -20,7 +20,7 @@ namespace FootballClient.DataAccess.Providers
             _restClient = restClient;
         }
 
-        public Task<CommentsResponse> LoadCommentsAsync(int id, int pageIndex, CommentType commentType, RequestAccessMode mode = RequestAccessMode.Server)
+        public Task<CommentsResponse> LoadCommentsAsync(int id, int pageIndex, CommentType commentType)
         {
             var request = new HttpRequestMessage();
 
@@ -36,7 +36,7 @@ namespace FootballClient.DataAccess.Providers
             request.RequestUri = uriBuilder.BuildParametersUri();
 
             var settings = new RestSettings<CommentsResponse>()
-                              .AddMode(mode)
+                              .AddMode(RequestAccessMode.Server)
                               .AddParser(new JsonParser<CommentsResponse>())
                               .AddRequestMessage(request);
 

@@ -53,7 +53,7 @@
                                         Width="{x:Bind backgroundGrid.Width, Mode=OneWay}"
                                         Grid.Row="0"
                                         Stretch="Uniform"
-                                        Source="{Binding NewsDetails.img.Value}"
+                                        Source="{Binding NewsDetails.Img.Value}"
                                         VerticalAlignment="Top"
                                         HorizontalAlignment="Stretch"
                                         IsHitTestVisible="False"/>
@@ -123,7 +123,7 @@
                                       Background="White"
                                       Grid.RowSpan="6"/>
 
-                        <TextBlock Text="{Binding NewsDetails.title, Converter={StaticResource StringCaseConverter}, ConverterParameter=UpperCase}"
+                        <TextBlock Text="{Binding NewsDetails.Title, Converter={StaticResource StringCaseConverter}, ConverterParameter=UpperCase}"
                                             FontSize="27"
                                             Grid.Row="1"
                                             FontWeight="SemiBold"
@@ -131,7 +131,7 @@
                                             TextWrapping="WrapWholeWords"
                                             Foreground="#212121"/>
 
-                                <TextBlock Text="{Binding NewsDetails.date}"
+                                <TextBlock Text="{Binding NewsDetails.Date}"
                                             Foreground="#A8A8A8"
                                             FontSize="19"
                                             Margin="0,2,0,9"
@@ -141,14 +141,14 @@
                                             Height="2"
                                             Grid.Row="3"/>
 
-                        <TextBlock Text="{Binding NewsDetails.description}"
+                        <TextBlock Text="{Binding NewsDetails.Description}"
                                             Foreground="#404040"
                                             TextWrapping="WrapWholeWords"
                                             FontSize="16"
                                             Margin="0,9,0,18"
                                             Grid.Row="4"/>
 
-                        <waslibs:HtmlBlock Source="{Binding NewsDetails.article}"
+                        <waslibs:HtmlBlock Source="{Binding NewsDetails.Article}"
                                                     Foreground="#212121"
                                                     FontSize="21"
                                                     Grid.Row="5"/>

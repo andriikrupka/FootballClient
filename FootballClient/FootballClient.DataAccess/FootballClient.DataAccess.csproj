@@ -59,6 +59,7 @@
     <Compile Include="Parsers\XmlParser.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Providers\AuthorsProvider.cs" />
+    <Compile Include="Providers\CategoryFinder\CategoryFinder.cs" />
     <Compile Include="Providers\CommentsProvider.cs" />
     <Compile Include="Providers\DataProviders.cs" />
     <Compile Include="Providers\FeedNewProvider.cs" />

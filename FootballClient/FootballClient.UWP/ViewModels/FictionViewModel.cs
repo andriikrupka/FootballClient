@@ -16,10 +16,10 @@ namespace FootballClient.UWP.ViewModels
         {
             _feedNewsProvider = feedNewsProvider;
             Category = category;
-            FeedItems = new IncrementalObservableCollection<News>(LoadMoreItemsAsync);
+            FeedItems = new IncrementalObservableCollection<NewsItem>(LoadMoreItemsAsync);
         }
 
-        public IncrementalObservableCollection<News> FeedItems { get; set; }
+        public IncrementalObservableCollection<NewsItem> FeedItems { get; set; }
 
         public Category Category { get; }
         public bool IsError { get; private set; }
@@ -31,10 +31,10 @@ namespace FootballClient.UWP.ViewModels
             await FeedItems.LoadMoreItemsAsync(0);
         }
 
-        private async Task<IList<News>> LoadMoreItemsAsync()
+        private async Task<IList<NewsItem>> LoadMoreItemsAsync()
         {
             BusyCount++;
-            var items = new List<News>();
+            var items = new List<NewsItem>();
             IsError = false;
             var lastItem = FeedItems.LastOrDefault();
             var dateTime = lastItem == null ? DateTimeOffset.Now : DateTimeOffset.Parse(lastItem.DatePublish);
