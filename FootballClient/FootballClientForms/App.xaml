@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<prism:PrismApplication xmlns="http://xamarin.com/schemas/2014/forms"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    x:Class="FootballClientForms.App"
+    xmlns:prism="clr-namespace:Prism.Unity;assembly=Prism.Unity.Forms"
+    xmlns:converters="clr-namespace:FootballClientForms.Converters;assembly=FootballClientForms">
+	<prism:PrismApplication.Resources>
+        <ResourceDictionary>
+            <Color x:FactoryMethod="FromHex" x:Key="GreenColor">
+                <x:Arguments><x:String>#00a603</x:String></x:Arguments>
+            </Color>
+
+
+            <Style TargetType="NavigationPage">
+                <Setter Property="BarBackgroundColor" Value="{StaticResource GreenColor}"/>
+                <Setter Property="BarTextColor" Value="Color.White"/>
+              </Style>
+            
+            <converters:HtmlTextToWebViewSourceConverter x:Key="HtmlTextToWebViewSourceConverter"/>
+            <converters:EmptyToBooleanConverter x:Key="EmptyToBooleanConverter"/>
+            <converters:StringToUriSourceConverter x:Key="StringToUriSourceConverter"/>
+            <converters:IntegerIncrementConverter x:Key="IntegerIncrementConverter"/>
+
+        </ResourceDictionary>
+	</prism:PrismApplication.Resources>
+</prism:PrismApplication>

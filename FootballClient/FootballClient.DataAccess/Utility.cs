@@ -5,8 +5,7 @@ using System.Reactive.Linq;
 using System.Reactive.Subjects;
 using System.Reactive.Threading.Tasks;
 using System.Threading.Tasks;
-using Windows.Security.Cryptography;
-using Windows.Security.Cryptography.Core;
+
 
 namespace FootballClient.DataAccess
 {
@@ -16,10 +15,11 @@ namespace FootballClient.DataAccess
         {
             public static string ComputeMd5(string strValue)
             {
-                var algorithm = HashAlgorithmProvider.OpenAlgorithm(HashAlgorithmNames.Md5);
-                var buffer = CryptographicBuffer.ConvertStringToBinary(strValue, BinaryStringEncoding.Utf8);
-                var hashed = algorithm.HashData(buffer);
-                return CryptographicBuffer.EncodeToHexString(hashed);
+                return Guid.NewGuid().ToString();
+                //var algorithm = HashAlgorithmProvider.OpenAlgorithm(HashAlgorithmNames.Md5);
+                //var buffer = CryptographicBuffer.ConvertStringToBinary(strValue, BinaryStringEncoding.Utf8);
+                //var hashed = algorithm.HashData(buffer);
+                //return CryptographicBuffer.EncodeToHexString(hashed);
             }
         }
     }

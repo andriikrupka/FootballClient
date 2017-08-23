@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ContentPage xmlns="http://xamarin.com/schemas/2014/forms" xmlns:controls="clr-namespace:FootballClientForms.Controls;assembly=FootballClientForms" xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml" x:Class="FootballClientForms.Views.NewsPage" Title="News">
+    <ListView ItemsSource="{Binding NewsItems}" SeparatorVisibility="None" RowHeight="110" x:Name="listView">
+        <ListView.ItemTemplate>
+            <DataTemplate>
+                <ViewCell>
+                    <Grid HeightRequest="90" VerticalOptions="CenterAndExpand">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="120" />
+                            <ColumnDefinition Width="*" />
+                        </Grid.ColumnDefinitions>
+                        <Grid.RowDefinitions>
+                            <RowDefinition />
+                            <RowDefinition Height="Auto" />
+                        </Grid.RowDefinitions>
+                        <Grid Grid.RowSpan="2" HorizontalOptions="FillAndExpand" VerticalOptions="FillAndExpand">
+                            <Image Source="{Binding ImageUrl, Converter={StaticResource StringToUriSourceConverter}}"
+                                   Aspect="AspectFill" />
+                        </Grid>
+                        <controls:MultiLineLabel Lines="2" FontSize="18" Grid.Column="1" Text="{Binding Title}" TextColor="#212121" LineBreakMode="TailTruncation" />
+                        <Label Grid.Row="1" Grid.Column="1" Text="{Binding FormattedDatePublish}" FontSize="14" TextColor="#bebebe" />
+                    </Grid>
+                </ViewCell>
+            </DataTemplate>
+        </ListView.ItemTemplate>
+    </ListView>
+   
+</ContentPage>

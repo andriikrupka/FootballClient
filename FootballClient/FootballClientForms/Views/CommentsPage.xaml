@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ContentPage xmlns="http://xamarin.com/schemas/2014/forms" 
+    xmlns:controls="clr-namespace:FootballClientForms.Controls;assembly=FootballClientForms"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:imagecircle="clr-namespace:ImageCircle.Forms.Plugin.Abstractions;assembly=ImageCircle.Forms.Plugin.Abstractions"
+    x:Class="FootballClientForms.Views.CommentsPage"
+    Title="Comments">
+	<Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+
+        <StackLayout Margin="0,8,0,0">
+            <controls:MultiLineLabel Text="{Binding Title}"
+                                     Margin="20,0"
+                                     LineBreakMode="TailTruncation"
+                                     Lines="2"
+                                     FontAttributes="Bold"
+                                     FontSize="18"/>
+
+            <Label Text="{Binding DatePublish}"
+                    FontSize="12"
+                    Margin="20,0"
+                    TextColor="#666666"/>
+        </StackLayout>
+
+
+          <StackLayout Grid.Row="1"
+            Padding="4,0"
+            BackgroundColor="{StaticResource GreenColor}"
+            Margin="20,4"
+           Spacing="0"
+            Orientation="Horizontal"
+            HorizontalOptions="EndAndExpand">
+
+            <Label Text="2" TextColor="White"/>
+            <Label Text="|" TextColor="White"/>
+            <Label Text="4" TextColor="White"/>
+            
+        </StackLayout>
+        
+        <BoxView HeightRequest="2"
+                Margin="20,4"
+                Grid.Row="1"
+                HorizontalOptions="FillAndExpand"
+                VerticalOptions="Start"
+                BackgroundColor="#212121"/>
+
+        <ListView Grid.Row="2"
+                    SeparatorVisibility="None"
+                    HasUnevenRows="true"
+                   ItemsSource="{Binding CommentItems}">
+            <ListView.ItemTemplate>
+                <DataTemplate>
+                    <ViewCell>
+                        <Grid Padding="20,10">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+
+                            <imagecircle:CircleImage Source="{Binding UserPhoto, Converter={StaticResource StringToUriSourceConverter}}"
+                                                     WidthRequest="49"
+                                                     FillColor="#c3c3c3"
+                                                     HeightRequest="49"
+                                                     VerticalOptions="Start"/>
+
+                            <StackLayout Grid.Column="1">
+                                <Label Text="{Binding UserName}"
+                                FontAttributes="Bold"
+                                TextColor="#404040"
+                                FontSize="16"/>
+                                <Grid IsVisible="{Binding Quote, Converter={StaticResource EmptyToBooleanConverter}}">
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition Height="Auto"/>
+                                        <RowDefinition Height="Auto"/>
+                                    </Grid.RowDefinitions>
+
+                                    <BoxView Grid.RowSpan="2"
+                                             WidthRequest="2"
+                                        BackgroundColor="{StaticResource GreenColor}"
+                                        HorizontalOptions="Start"
+                                        VerticalOptions="FillAndExpand"/>
+                                    
+                                    <Label Text="{Binding Quote.UserName}"
+                                        Margin="4,0,0,0"
+                                        TextColor="#808080"
+                                           FontSize="14"
+                                    FontAttributes="Bold"/>
+                                    
+                                    <controls:HtmlLabel Grid.Row="1" 
+                                        FontSize="14"
+                                        Margin="4,0,0,0"
+                                        TextColor="#808080"
+                                    Text="{Binding Quote.Text}" LineBreakMode="WordWrap"/>
+                                </Grid>
+                            <controls:HtmlLabel 
+                                Text="{Binding Text}"
+                                LineBreakMode="WordWrap"
+                                FontSize="16"/>
+                                </StackLayout>
+                        </Grid>
+                    </ViewCell>
+                </DataTemplate>
+            </ListView.ItemTemplate>
+        </ListView>
+    </Grid>
+</ContentPage>

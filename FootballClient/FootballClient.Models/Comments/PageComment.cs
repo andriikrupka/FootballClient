@@ -3,6 +3,7 @@ using System.Globalization;
 using System.Net;
 using System.Runtime.Serialization;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace FootballClient.Models
 {
@@ -63,6 +64,8 @@ namespace FootballClient.Models
 
         [IgnoreDataMember]
         public string PostedTime { get; private set; }
+
+        public Quote Quote => Quotes?.FirstOrDefault();
 
         [OnDeserialized]
         public void OnDeserialized(StreamingContext context)

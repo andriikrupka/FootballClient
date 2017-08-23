@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Globalization;
 using System.Net;
 using System.Runtime.Serialization;
 
@@ -6,8 +7,6 @@ namespace FootballClient.Models
 {
     public class NewsItem
     {
-        private string _formattedDatePublish;
-
         public int Id { get; set; }
         public int PageId { get; set; }
         public string Link { get; set; }
@@ -17,26 +16,7 @@ namespace FootballClient.Models
         public string ImageAlt { get; set; }
         public string DatePublish { get; set; }
 
-        public string FormattedDatePublish
-        {
-            get
-            {
-                if (string.IsNullOrEmpty(_formattedDatePublish))
-                {
-                    DateTimeOffset publishedDateTime;
-                    if (DateTimeOffset.TryParse(DatePublish, out publishedDateTime))
-                    {
-                        _formattedDatePublish = publishedDateTime.ToString("dd MMMM yyyy, HH:mm");
-                    }
-                    else
-                    {
-                        _formattedDatePublish = DatePublish;
-                    }
-                }
-
-                return _formattedDatePublish;
-            }
-        }
+        public string FormattedDatePublish { get; private set; }
 
         [IgnoreDataMember]
         public DateTimeOffset DateTimeOffsetPublish { get; private set; }
@@ -46,6 +26,16 @@ namespace FootballClient.Models
         {
             Title = WebUtility.HtmlDecode(Title ?? string.Empty);
             TextIntro = WebUtility.HtmlDecode(TextIntro ?? string.Empty);
+
+            if (DateTimeOffset.TryParse(DatePublish, out DateTimeOffset publishedDateTime))
+            {
+                DateTimeOffsetPublish = publishedDateTime;
+                FormattedDatePublish = publishedDateTime.ToString("dd MMMM yyyy, HH:mm", new CultureInfo("ru-RU"));
+            }
+            else
+            {
+                FormattedDatePublish = DatePublish;
+            }
         }
     }
 }

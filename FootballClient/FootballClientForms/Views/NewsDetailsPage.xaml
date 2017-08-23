@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<local:DetailsPage xmlns="http://xamarin.com/schemas/2014/forms"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:controls="clr-namespace:FootballClientForms.Controls;assembly=FootballClientForms"
+    xmlns:local="clr-namespace:FootballClientForms.Views;assembly=FootballClientForms"
+    x:Class="FootballClientForms.Views.NewsDetailsPage"
+    xmlns:parallax="clr-namespace:DevsDNA.XFParallax;assembly=DevsDNA.XFParallax"
+    Title="Details">
+
+    <ScrollView>
+        <Label Margin="0,8,0,0" Text="{Binding CurrentItem.Article}"/>
+    </ScrollView>
+<!--    <Grid>-->
+        <!--<Grid.RowDefinitions>
+            <RowDefinition Height="200" x:Name="Row1Header" />
+            <RowDefinition Height="*" />
+            <RowDefinition Height="49" />
+        </Grid.RowDefinitions>-->
+        <!--<Grid x:Name="HeaderView">
+            <Image HorizontalOptions="FillAndExpand" VerticalOptions="FillAndExpand" Source="{Binding CurrentItem.Img.Value}" Aspect="AspectFill" />
+        </Grid>-->
+       <!-- <ScrollView Grid.RowSpan="2"
+            VerticalOptions="StartAndExpand"
+            x:Name="parallaxScrollView">
+            <Grid RowSpacing="0">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="200" x:Name="Row1Content" />
+                    <RowDefinition Height="Auto" />
+                </Grid.RowDefinitions>
+
+                 <Grid x:Name="MainStack"
+                     VerticalOptions="End"
+                     HorizontalOptions="FillAndExpand">
+                        
+                    <Image Source="profile_pic_shadow.png" 
+                           Aspect="AspectFill"
+                           HorizontalOptions="FillAndExpand" 
+                           VerticalOptions="FillAndExpand"/>
+
+                    <Label Text="{Binding CurrentItem.Title}"
+                            TextColor="White"
+                            FontSize="15"
+                            Margin="20,8"
+                           FontAttributes="Bold"
+                            VerticalOptions="End"/>
+
+                </Grid>
+                
+                <Grid Grid.Row="1"
+                    Padding="20,0"
+                    BackgroundColor="White">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                    </Grid.RowDefinitions>
+                    <Label Grid.Row="0" Text="{Binding CurrentItem.Description}"
+                    FontAttributes="Italic"/>
+                    <controls:HtmlLabel Margin="0,8,0,0" Text="{Binding CurrentItem.Article}"
+                        Grid.Row="1"/>-->
+<!--                    <controls:ExtendedWebView Grid.Row="1" Source="{Binding CurrentItem.Article, Converter={StaticResource HtmlTextToWebViewSourceConverter}}"/>-->
+                <!--</Grid>
+            </Grid>
+        </ScrollView> -->
+
+       <!-- <Grid Grid.Row="2"
+              BackgroundColor="{StaticResource GreenColor}"
+              Padding="20,0">
+            <Button Image="ic_comments.png"
+                    Command="{Binding ViewCommentsCommand}"
+                    WidthRequest="25"
+                    HeightRequest="25"
+                    HorizontalOptions="End"/>
+        </Grid>-->
+<!--    </Grid>-->
+</local:DetailsPage>

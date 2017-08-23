@@ -37,11 +37,11 @@ namespace FootballClient.DataAccess.Providers
                     .AddParser(new JsonParser<NewsResponse>())
                     .AddRequestMessage(new HttpRequestMessage(HttpMethod.Get, uriBuider.BuildParametersUri()));
 
-            var newsResponse = await _restClient.SendAsync(settings, onError: onError);
+            var newsResponse = await _restClient.SendAsync(settings, onError: onError).ConfigureAwait(false);
             try
             {
                 var fillDetailsTask = newsResponse.News.Select(x => GetDetailsAsync(x.Id, x.DateTimeOffsetPublish, false));
-                await Task.WhenAll(fillDetailsTask);
+                await Task.WhenAll(fillDetailsTask).ConfigureAwait(false);
             }
             catch (Exception)
             {
@@ -67,7 +67,7 @@ namespace FootballClient.DataAccess.Providers
                     return true;
 
                 return requestIfExists && Math.Abs((publishedDate.UtcDateTime - tupleData.Item2.Value).TotalDays) < 1;
-            });
+            }).ConfigureAwait(false);
 
         
             return result?.Channel?.Item;
